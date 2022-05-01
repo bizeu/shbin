@@ -27,8 +27,8 @@ commit:
 head:
 	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && \
 	brew reinstall --quiet bizeu/tap/shbin $(basename) && \
-	brew postinstall --quiet $(basename)  # --HEAD no se puede upgrade, reinstall not postinstall
-
+	brew postinstall --quiet $(basename)  # brew upgrade can not be done when --HEAD installed
+	
 install:
 	@sleep 1
 	@python3 -m pip download --quiet $(basename)==$(next) --no-binary :all: || true
@@ -49,6 +49,9 @@ local: build
 	@git tag v0.0.0-alpha-$$(git rev-parse --short HEAD)
 	@PYTHONWARNINGS="ignore" python3 -m pip install --force-reinstall --quiet dist/*.whl
 	@python3 -m pip show $(basename) | awk '/^Version: / { print $2 }'
+
+main:
+	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && brew upgrade --quiet $(basename)
 
 publish: build
 	@git tag $(next)
