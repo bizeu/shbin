@@ -51,7 +51,7 @@ local: build
 	@python3 -m pip show $(basename) | awk '/^Version: / { print $2 }'
 
 main:
-	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && brew upgrade --quiet $(basename)
+	@git add -A && git commit --quiet -m "auto" && git push --quiet && brew upgrade --quiet $(basename)
 
 publish: build
 	@git tag $(next)
