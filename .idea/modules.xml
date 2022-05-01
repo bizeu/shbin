@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file:///usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" filepath="/usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/shbin.iml" filepath="$PROJECT_DIR$/.idea/shbin.iml" />
     </modules>
   </component>

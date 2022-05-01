@@ -24,6 +24,9 @@ commit:
 	@git add -A
 	@git commit -a -m "$(next): build" || true
 
+head:
+	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && brew install --quiet --upgrade --HEAD $(basename)
+
 install:
 	@sleep 1
 	@python3 -m pip download --quiet $(basename)==$(next) --no-binary :all: || true
@@ -41,7 +44,7 @@ install:
 local: build
 	@git add -A
 	@git commit -a -m "fix: local"
-	@git tag "$(svu next)"
+	@git tag v0.0.0-alpha-$$(git rev-parse --short HEAD)
 	@PYTHONWARNINGS="ignore" python3 -m pip install --force-reinstall --quiet dist/*.whl
 	@python3 -m pip show $(basename) | awk '/^Version: / { print $2 }'
 
