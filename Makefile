@@ -28,7 +28,7 @@ head:
 	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && \
 	brew reinstall --quiet bizeu/tap/shbin $(basename) && \
 	brew postinstall --quiet $(basename)  # brew upgrade can not be done when --HEAD installed
-	
+
 install:
 	@sleep 1
 	@python3 -m pip download --quiet $(basename)==$(next) --no-binary :all: || true
