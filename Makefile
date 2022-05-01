@@ -25,7 +25,9 @@ commit:
 	@git commit -a -m "$(next): build" || true
 
 head:
-	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && brew install --quiet --upgrade --HEAD $(basename)
+	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && \
+	brew reinstall --quiet bizeu/tap/shbin $(basename) && \
+	brew postinstall --quiet $(basename)  # --HEAD no se puede upgrade, reinstall not postinstall
 
 install:
 	@sleep 1
