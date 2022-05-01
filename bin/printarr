@@ -1,0 +1,7 @@
+#!/bin/sh
+
+#
+# print array/arguments with new line, ignore empty lines and sort
+
+set -eu
+printf '%s\n' "$@" | grep -v "^$" | sort

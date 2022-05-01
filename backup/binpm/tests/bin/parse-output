@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. helper.sh
+
+for arg do
+  case "${arg}" in
+    --debug|--dry-run|--no-quiet|--quiet|--verbose|--warning|--white) parse "${arg}" ;;
+  esac
+done
+
+echo "DEBUG: ${DEBUG:-}"
+echo "DRY_RUN: ${DRY_RUN:-}"
+echo "QUIET: ${QUIET:-}"
+echo "VERBOSE: ${VERBOSE:-}"
+echo "WARNING: ${WARNING:-}"
+echo "WHITE: ${WHITE:-}"
+

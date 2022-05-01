@@ -1,0 +1,19 @@
+# shellcheck shell=bash
+
+#######################################
+# common completion for -h, -help, help commands and no additional arguments
+# Globals:
+#   COMPREPLY
+# Arguments:
+#   1     name of the command whose arguments are being completed
+#   2     word being completed ("cur")
+#   3     word preceding the word being completed or $1 when is the first word ("prev")
+#######################################
+_helps() {
+  [ "$1" = "$3" ] || return 0
+  mapfile -t COMPREPLY < <(compgen -W "-h --help help" -- "$2")
+}
+
+complete -F _helps isaction
+complete -F _helps isdebian
+complete -F _helps ismacos

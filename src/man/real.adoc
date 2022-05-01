@@ -1,0 +1,77 @@
+:includedir: /usr/local/include/man
+== SYNOPSIS
+
+[verse]
+*{manname}* [_OPTION_]... [_PATH_]
+include::{includedir}/template.adoc[tag=synopsys-information]
+
+== DESCRIPTION
+
+The *{manname}* command will show the absolute _logical/symlink_ (default)
+or the _resolved/physical_ (_--resolved_|_-P_) path
+of the _PATH_ option (default: cwd).
+
+If _PATH_ does not exist, *{manname}* will not fail (unless _--fail_ option is used) if the parent of _PATH_ exists,
+the absolute path will be constructed with the dirname of _PATH_ (exists) and basename of _PATH_ (does not exist).
+
+== OPTIONS
+
+*PATH*
+The absolute or relative path to use (default: cwd).
+
+*--dirname*::
+Show dirname instead of _PATH_.
+
+*--fail*::
+Exit _1_ if _PATH_ does not exists.
+
+*-P, --resolved*::
+Resolve symlinks (pwd -P).
+
+include::{includedir}/template.adoc[tag=options-output]
+
+== ARGUMENTS
+
+include::{includedir}/template.adoc[tag=arguments-information]
+
+== EXIT STATUS
+
+*0*::
+Success.
+
+*1*::
+Directory or File not Found (_--fail_ option). +
+Directory not Found.
+
+== ENVIRONMENT
+
+include::{includedir}/template.adoc[tag=environment-output]
+
+== OUTPUT
+
+For more information, see: _<<_arguments-information>>_
+and to control output, see: _<<_options-output>>_ and _Environment <<_environment-output>>_.
+
+== EXAMPLES
+
+[verse]
+_$_ *{manname}*
+
+_$_ cd /; *{manname}* _--dirname_ tmp
+
+_$_ cd /; *{manname}* _--resolved_ tmp
+
+_$_ cd /; *{manname}* _-P_ tmp
+
+_$_ *{manname}* _--fail --quiet_ foo
+
+_$_ *{manname}* _--fail --resolved_ --quiet foo
+
+_$_ *{manname}* _--fail_ foo
+
+
+include::{includedir}/template.adoc[tag=repository-and-copying]
+
+== SEE ALSO
+
+genman(1), fromman(1), parse(1)

@@ -1,0 +1,54 @@
+:includedir: /usr/local/include/man
+== SYNOPSIS
+
+[verse]
+*{manname}* [_OPTION_]... _FILE|DIRECTORY_ ... [_EXPRESSION_]...
+include::{includedir}/template.adoc[tag=synopsys-information]
+
+== DESCRIPTION
+
+The *{manname}* utility recursively scans *upwards* the
+_FILE|DIRECTORY_ (dirname of _FILE_ is used, if _FILE|DIRECTORY_ is a file) tree for each _DIRECTORY_ listed,
+evaluating an _EXPRESSION_
+(composed of the “primaries” and “operands” listed in find(1)) in terms of each file in the tree.
+
+== OPTIONS
+
+See _find(1)_.
+
+== ARGUMENTS
+
+*FILE|DIRECTORY*::
+_DIRECTORY_ to walk upwards (dirname of _FILE_ is used, if _FILE|DIRECTORY_
+is a file)
+
+include::{includedir}/template.adoc[tag=arguments-information]
+
+== EXPRESSION
+
+See _find(1)_.
+
+== EXIT STATUS
+
+*0*::
+Success.
+
+*1*::
+No such file or directory. +
+
+== EXAMPLES
+
+[verse]
+_$_ *{manname}* .
+
+_$_ *{manname}* . -name .env +
+
+_$_ *{manname}* . -type d -name .git -exec dirname "\{}" \; | tail -1 +
+
+_$_ -H *{manname}* /tmp +
+
+include::{includedir}/template.adoc[tag=repository-and-copying]
+
+== SEE ALSO
+
+find(1)

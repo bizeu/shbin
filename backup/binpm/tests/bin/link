@@ -1,0 +1,5 @@
+#!/bin/sh
+
+. helper.sh
+. has-link.sh
+has -a "$(basename "${0}")"

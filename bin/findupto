@@ -1,0 +1,74 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# show usage
+# Arguments:
+#   1
+#######################################
+help() {
+  if test $# -ne 0; then
+    case "$1" in
+      -h|--help|help) rc=0 ;;
+      -*) >&2 printf '%s\n\n' "${0##*/}: $1: invalid option/argument" ;;
+      *) return 0 ;;
+    esac
+  fi
+
+  >&2 cat <<EOF
+usage: ${0##*/} <filename> [--home|--super|--top|<directory>]
+   or: ${0##*/} [-h|--help|help]
+
+outputs the path of <filename> when searched from the current directory up to / or <dir>
+
+Arguments:
+  filename            the file to search for
+
+Options:
+  --home              stop searching at user's home directory
+  --super             stop searching at git superproject root
+  --top               stop searching at git top level
+  directory           the directory to stop searching at (default: /)
+
+Commands:
+   -h, --help, help   display this help and exit.
+EOF
+  exit "${rc:-1}"
+}
+
+#######################################
+# outputs the path of <filename> when searched from the current directory up to / or <dir>
+# Arguments:
+#   <filename>  file to search for
+#   <dir>       directory to stop searching at (default: /)
+# Examples:
+#    mkdir -p /tmp/foo/bar && cd /tmp/foo/bar && touch baz
+#    mkdir -p project/foo && cd project/foo && find_up baz
+#    # output: /tmp/foo/bar/baz
+#    find_up baz /tmp/foo/bar/project
+#    # output:
+#######################################
+main() {
+  case "${2-}" in
+    --home) stop="${HOME}" ;;
+    --super) stop="$(git rev-parse --show-toplevel)" ;;
+    --top) stop="$(git rev-parse --show-toplevel)" ;;
+    *)
+      test -d "${2-}" || { >&2 echo  "${0##*/}: $2: No such directory"; exit 1; }
+      stop="${2:-/}"
+      ;;
+  esac
+
+  help "$@"
+
+  (
+    while true; do
+      [ ! -f "$1" ] || { echo "${PWD}/$1"; break; }
+      [ "${PWD}" != "${stop}" ] || break
+      cd ..
+    done
+  )
+}
+
+main "$@"

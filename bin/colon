@@ -1,0 +1,378 @@
+#!/bin/sh
+
+#
+# Prepend (beginning, the default), append (end) or remove to colon variables (PATH, INFOPATH, MANPATH etc.)
+set -eu
+: "${BINPM?"undefined: '/etc/profile' needs to be sourced"}"
+
+#######################################
+# adds bin, sbin, share/man and share/info
+# Globals:
+#   APPEND              Add at the end.
+#   EXISTS              Add even if it does not exist with EXISTS=0 for $MANPATH (default: 1).
+#   EXPORT              Variable name to add export command.
+#   REMOVE              Remove for the path value.
+# Optional Arguments:
+#   1                   The directory or file (default: git top).
+# Outputs:
+#   Updated $PATH, $MANPATH and $INFOPATH values for eval.
+#######################################
+base() {
+  unset PATH MANPATH INFOPATH
+  SHOW=0 bins /bin
+  SHOW=0 bins /usr/bin
+  [ "${SHOW-0}" -eq 0 ] || show
+  unset _i
+}
+
+#######################################
+# adds bin, sbin, share/man and share/info
+# Globals:
+#   APPEND              Add at the end.
+#   EXISTS              Add if it does not exist with EXISTS=0 for $MANPATH under git repository (default: 1).
+#   EXPORT              Variable name to add export command.
+#   REMOVE              Remove for the path value.
+# Optional Arguments:
+#   1                   The directory or file (default: git top).
+# Outputs:
+#   Updated $PATH, $MANPATH and $INFOPATH values for eval.
+#######################################
+bins() {
+  exists=1
+
+  if [ "${1-}" ]; then
+    top="$(pwd "${1}")"
+    if [ "${top-}" ] && [ ! -d "${top}/.git" ]; then
+      PATH="$(run "${top}" "${PATH:-}")"
+      { [ "${top}" = "${HOME}" ] || [ "${top}" = '/' ]; } || top="$(pwd "$(command -p dirname "${top}")")"
+    fi
+  elif ! top="$(git top)"; then
+    top="$(pwd '.')"
+  fi
+  if [ "${top-}" ] && [ "${top}" != '/' ] && [ "${top}" != "${HOME}" ] && [ -d "${top}/.git" ]; then
+    exists=0
+    # TODO: hacer eval de las de TOP y PYCHARM, etc. y sacarlas al final. cuando
+    #   acabe bins, o init.....
+    if [ "${SHOW-0}" -eq 1 ]; then
+      echo "TOP='${top}'"
+      EXPORT="$(command -p basename "${top}" | command -p tr '[:lower:]' '[:upper:]' | command -p sed 's/-/_/g')" \
+        output "${top}"
+    fi
+  fi
+
+  for i in bin sbin; do
+    sep=''; [ "${top-}" = '/' ] || sep='/'
+    PATH="$(run "${top-}${sep}${i}" "${PATH:-}")"
+    [ ! -d "${top-}${sep}tests/${i}" ] || PATH="$(run "${top}${sep}tests/${i}" "${PATH:-}")"
+  done
+
+  MANPATH="$(EXISTS="${exists:-1}" run "${top-}/share/man" "${MANPATH:-}")"; export MANPATH
+  INFOPATH="$(run "${top-}/share/info" "${INFOPATH:-}")"; export INFOPATH
+  [ "${SHOW-0}" -eq 0 ] || show
+  unset i sep top
+}
+
+#######################################
+# clean $PATH, $MANPATH and $INFOPATH
+# Globals:
+#   APPEND              Add at the end.
+#   EXPORT              Variable name to add export command.
+# Arguments:
+#   None
+#######################################
+clean() {
+  unset value
+  for part in $(echo "${PATH}" | tr ':' '\n'); do
+    value="$(APPEND=true run "${part}" "${value:-}")"
+  done
+  PATH="${value}"
+
+  unset value
+  for part in $(echo "${MANPATH:-}" | tr ':' '\n'); do
+    value="$(APPEND=true run "${part}" "${value:-}")"
+  done
+  MANPATH="${value:-}"
+
+  unset value
+  for part in $(echo "${INFOPATH:-}" | tr ':' '\n'); do
+    value="$(APPEND=true run "${part}" "${value:-}")"
+  done
+  INFOPATH="${value:-}"
+
+  show
+}
+
+#######################################
+# brew gems
+#######################################
+gems() {
+  if [ -d "${HOMEBREW_LIB-}/ruby/gems" ]; then
+    gems="$(find "${HOMEBREW_LIB-}/ruby/gems" -type d -name bin -maxdepth 2 -print0)"
+    [ ! "${gems-}" ] || PATH="$(run "${gems}" "${PATH}")"
+  fi
+}
+
+#######################################
+# init $PATH, $MANPATH and $INFOPATH
+# Globals:
+#   APPEND              Add at the end.
+#   EXISTS              Add even if it does not exist with EXISTS=0 for $MANPATH (default: 1).
+#   EXPORT              Variable name to add export command.
+#   REMOVE              Remove for the path value.
+# Optional Arguments:
+#   1                   The directory or file (default: git top).
+# Outputs:
+#   Updated $PATH, $MANPATH and $INFOPATH values for eval.
+#######################################
+init() {
+  # shellcheck source=./system.sh
+  : "${BINPM?"undefined: '/etc/profile' needs to be sourced"}"
+  base
+  pycharm
+  paths_d
+  [ ! "${CLT-}" ] || bins "${CLT}/usr/bin"
+  kegs
+  gems
+  bins /usr/local/bin
+  [ "${HOMEBREW_PREFIX-}" = /usr/local ] || bins "${HOMEBREW_PREFIX}/bin"
+  bins /opt/bin
+  SHOW=1 bins "${BINPM}"
+}
+
+#######################################
+# keg only brew
+#######################################
+kegs() {
+  if [ -d "${HOMEBREW_OPT-}" ] && [ "${HOMEBREW_KEGS-}" ]; then
+    for k in ${HOMEBREW_KEGS}; do
+      [ ! -d "${HOMEBREW_OPT}/${k}/bin" ] || bins "${HOMEBREW_OPT}/${k}/bin"
+    done
+  fi
+}
+
+#######################################
+# Show plain output or with export command
+# Globals:
+#   EXPORT              Variable name to add export command.
+# Arguments:
+#   value               Path value to show or add export command.
+# Output:
+#   value or variable and value with export command.
+#######################################
+output() {
+  if [ "${1-}" ]; then
+    if [ "${EXPORT-}" ]; then
+      if [ "${EXPORT}" = 'MANPATH' ]; then
+        add=':'
+        ! command -v most >/dev/null || echo "MANPAGER='most'; export MANPAGER"
+      fi
+      echo "${EXPORT}='${1}${add:-}'; export ${EXPORT}"
+    else
+      echo "${1}"
+    fi
+  fi
+  unset add EXPORT
+}
+
+#######################################
+# eval /etc/paths.d to $PATH
+# Globals:
+#   APPEND              Add at the end.
+#   EXPORT              Variable name to add export command.
+# Arguments:
+#   None
+#######################################
+paths_d() {
+  if [ -d /etc/paths.d ]; then
+    paths_d_tmp="$(mktemp)"
+    cat /etc/paths.d/* >"${paths_d_tmp}" 2>/dev/null || true
+    while read -r _i; do PATH="$(APPEND=true run "${_i}" "${PATH}")"; done < "${paths_d_tmp}"
+    unset _i init_tmp paths_d_tmp
+  fi
+}
+
+#######################################
+# absolute path of directory or the parent if is file
+# Optional Arguments:
+#   1       File or directory.
+# Returns:
+#   1 if not file nor directory.
+# Outputs:
+#   physical pwd.
+#######################################
+pwd() (
+  # shellcheck disable=SC2086
+  if [ -e "${1-}" ]; then
+    d="${1}"
+    [ -d "${d}" ] || d="$(command -p dirname "${d}")"
+    command -p cd "${d}" && command -p pwd ${PHYSICAL}
+  fi
+  unset d
+)
+
+#######################################
+# pycharm paths
+# Globals:
+#   APPEND              Add at the end.
+# Arguments:
+#   None
+#######################################
+pycharm() {
+  if [ "${PYCHARM-}" ]; then
+    PATH="$(APPEND=true run "${PYCHARM}" "${PATH}")"
+    PATH="$(APPEND=true run "${PYCHARM_CONTENTS}/MacOS" "${PATH}")"
+  fi
+}
+
+#######################################
+# Prepend (beginning, the default), append (end) or remove
+# Globals:
+#   APPEND              Add at the end.
+#   EXISTS              Add even if it does not exist with EXISTS=0 for $MANPATH (default: 1).
+#   EXPORT              Variable name to add export command.
+#   REMOVE              Remove for the path value.
+# Arguments:
+#   1                   The directory to prepend (default), append (--append) or remove (--remove).
+# Optional Arguments:
+#   2                   Path value to manipulate (default: "" if 'DIRECTORY' provided, 'PATH' if no 'DIRECTORY').
+# Outputs:
+#   Updated path value.
+#######################################
+run() {
+  if $REMOVE; then
+    directory="${1}"
+  elif [ "${EXISTS-1}" -eq 1 ]; then
+    directory="$(pwd "${1}")"
+  elif [ "${EXISTS-1}" -eq 0 ]; then
+    directory="${1}"  # For MANPATH since they are generated.
+  fi
+
+  # shellcheck disable=SC2295
+  value="${2%:}"  # Removes trailing ':' if exists (because of $MANPATH)
+  if [ "${directory-}" ] && [ ! "${value}" ]; then
+    $REMOVE || output "${directory}"
+  elif [ "${directory-}" ]; then
+    case ":${value}:" in
+      *:"${directory}":*)
+        if $REMOVE; then
+          output "$(echo "${value}" | command -p sed "s|^${directory}:||; s|:${directory}:|:|; s|:${directory}$||")"
+        else
+          output "${value}"
+        fi
+        ;;
+      *)
+        if $REMOVE; then
+          output "${value}"
+        elif $APPEND; then
+          output "${value}:${directory}"
+        else
+          output "${directory}:${value}"
+        fi
+      ;;
+    esac
+  else
+    output "${value}"
+  fi
+  unset directory
+}
+
+#######################################
+# eval /etc/paths.d to $PATH
+# Globals:
+#   APPEND              Add at the end.
+#   EXPORT              Variable name to add export command.
+# Arguments:
+#   None
+#######################################
+show() {
+  EXPORT=PATH output "${PATH}"
+  [ ! "${MANPATH-}" ] || EXPORT=MANPATH output "${MANPATH}"
+  [ ! "${INFOPATH-}" ] || EXPORT=INFOPATH output "${INFOPATH}"
+}
+
+#######################################
+# Prepend (beginning, the default), append (end) or remove to colon variables (PATH, INFOPATH, MANPATH etc.)
+# Globals:
+#   APPEND              Add at the end.
+#   EXISTS              Do not add it if the directory does not exist (does not apply to $REMOVE).
+#   EXPORT              Variable name to add export command.
+#   REMOVE              Remove for the path value.
+# Optional Arguments:
+#   --append            Add at the end.
+#   --dev               Add project paths.
+#   --exists            Do not add it if the directory does not exist (does not apply to $REMOVE).
+#   --export=<var name> Show variable name with value and export command for eval (default: 'PATH).
+#   --remove            Remove for the path value.
+#   DIRECTORY           The directory to prepend (default), append (--append) or remove (--remove).
+#                       (default: script directory and script directory parent with sbin).
+#   VALUE               Path value to manipulate (default: "" if 'DIRECTORY' provided, 'PATH' if no 'DIRECTORY').
+# Note:
+#   Generates file to be sourced for the three variables when not arguments are provided.
+# Outputs:
+#   Updated path value or variable and value with export command.
+# Examples:
+#   $ colon
+#   .../sbin:.../bin:$PATH
+#   $ colon --export
+#   PATH='.../sbin:.../bin:$PATH'; export PATH
+#   $ colon -e
+#   PATH='.../sbin:.../bin:$PATH'; export PATH
+#   $ colon --base
+#   /usr/...
+#   $ colon /rc.d "$(colon --base)"
+#   /rc.d:/usr/...
+#   $ colon --base -e
+#   PATH='/usr/...'; export PATH
+#   $ color --init
+#   PATH='...'; export PATH
+#   $ colon /foo
+#   foo
+#   $ colon /foo -e
+#   PATH='foo'; export PATH
+#   $ colon /foo --export=PATH
+#   PATH='foo'; export PATH
+#   $ colon /foo /bar
+#   /foo:/bar
+#   $ colon /foo /bar --export=MANPATH
+#   MANPATH='/foo:/bar'; export MANPATH
+#   $ colon /foo /bar --append
+#   /bar:/foo
+#   $ colon /foo /bar --append --export=INFOPATH
+#   INFOPATH='/bar:/foo'; export INFOPATH
+#   $ colon --append /foo /bar
+#   /bar:/foo
+#   $ colon --append /foo /bar --export
+#   PATH='/bar:/foo'; export PATH
+#   $ colon /foo --remove /bar:/foo
+#   /bar
+#   $ colon /foo --remove /bar:/foo --export=
+#   PATH='/bar'; export PATH
+#######################################
+main() {
+  APPEND=false; EXISTS=1; PHYSICAL=''; REMOVE=false
+
+  if [ ! "${1-}" ]; then
+    clean
+  else
+    for arg do
+      skip=true
+      case "${arg}" in
+        --append) APPEND=true ;;
+        -P|--physical) PHYSICAL='-P' ;;
+        --base) func="${arg#--}"; SHOW=1 ;;
+        --bins) func="${arg#--}"; SHOW=1 ;;
+        --export|--export=) EXPORT='PATH' ;;
+        --export=*) EXPORT="${arg#--export=}" ;;
+        --init) func="${arg#--}"; SHOW=0 ;;
+        --remove) REMOVE=true ;;
+        --*) fromman "$0" "$@" || exit 0 ;;
+        *) skip=false
+      esac
+      shift
+      $skip || set -- "$@" "${arg}"
+    done
+    ${func:-run} "$@"
+  fi
+}
+
+main "$@"

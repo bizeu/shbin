@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd "${1}" || exit 1
+rm -rf d1 d2 d3
+mkdir d1
+ln -s d1 d2
+ln -s d2 d3
+touch d1/f1
+ln -s d1/f1 d1/f2

@@ -1,0 +1,55 @@
+#!/bin/sh
+
+#
+# walk a file hierarchy upwards
+set -eu
+
+#######################################
+# command -p cd
+# Arguments:
+#   1   directory
+#######################################
+cd() { command -p cd "$1"; }
+
+#######################################
+# walk a file hierarchy upwards
+# Globals:
+#   PWD
+# Arguments:
+#   None
+#######################################
+main() {
+  if [ "${1-}" ]; then
+    fromman "$0" "$@"
+    found=false
+    for arg do
+      shift; skip=false
+      case "${arg}" in
+        -*) $found || { opt="${opt:+${opt} }${arg}"; skip=true; } ;;
+        *)
+          if ! $found; then
+            if [ -e "${arg}" ]; then
+              found=true; skip=true
+              [ -d "${arg}" ] || arg="$(command -p dirname "${arg}")"
+              cd "${arg}"
+            else
+              echo "${0##*/}: ${arg}: No such file or directory"
+              exit 1
+            fi
+          fi
+      esac
+      $skip || set -- "$@" "${arg}"
+    done
+    while [ "${PWD}" != / ] ; do
+      # shellcheck disable=SC2086
+      command -p find ${opt-} "${PWD}" -maxdepth 1 "$@"
+      cd ..
+    done
+  else
+    # shellcheck disable=SC2185
+    find --help 2>/dev/null || find
+    exit 1
+  fi
+}
+
+main "$@"

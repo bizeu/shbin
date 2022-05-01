@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. helper.sh
+
+#######################################
+# repo_test_main is a test script in sh with main() function and not file header
+#######################################
+main() {
+  for arg do
+    case "${arg}" in
+      --debug|--dry-run|--no-quiet|--quiet|--verbose|--warning|--white) parse "${arg}" ;;
+      --*) fromman "$0" "$@" || exit 0
+    esac
+  done
+}
+
+main "$@"

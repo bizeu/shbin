@@ -1,0 +1,90 @@
+#!/bin/sh
+
+#
+# absolute logical (symlink) or resolved (physical) path
+. helper.sh
+
+#######################################
+# absolute logical (symlink) or resolved (physical) path
+# Arguments:
+#   --dirname       Show dirname instead of path (default: unset)
+#   --fail          Exit if path does not exist (default: unset)
+#   -P|--resolved   Resolve symlinks (pwd -P).
+#   path            Path (default: cwd).
+# Output:
+#   Path or help message to stdout.
+# Returns:
+#   1 if parent directory does not exist.
+# Examples:
+#   $ real --resolved /tmp/file  # one level up: accepts, if not file/dir.
+#   /private/tmp/file
+#   $ real --resolved --fail /tmp/file    # one level up: does not accept, if not file/dir.
+#   Directory not Found: /tmp/file
+#   $ real --dirname --resolved /tmp/file  # one level up: accepts, if not file/dir.
+#   /private/tmp
+#   $ real --resolved --fail --quiet /tmp/file
+#   Directory not Found: /tmp/file
+#   $ real --resolved /tmp/file1/file2
+#   Directory not Found: /tmp/file1
+#   $ cd /tmp; rm -rf d1 d2 d3; mkdir d1; ln -s d1 d2; ln -s d2 d3; touch d1/f1;ln -s d1/f1 d1/f2;real --resolved d3/f2
+#   /private/tmp/d1/f1
+#   $ cd /tmp; rm -rf d1 d2; mkdir d1; ln -s d1 d2; touch d1/f1;ln -s d1/f1 d1/f2;real --resolved d2/f2
+#   /private/tmp/d1/f1
+#   $ cd /tmp; rm -rf d1 d2; mkdir d1; ln -s d1 d2; touch d1/f1;ln -s d1/f1 d1/f2;real --resolved d2/f1
+#   /private/tmp/d1/f1
+#   $ cd /tmp; rm -rf d1 d2; mkdir d1; ln -s d1 d2; touch d1/f1;ln -s d1/f1 d1/f2;real --resolved d1/f2
+#   /private/tmp/dir1/file1
+#######################################
+main() {
+  for arg do
+    case "${arg}" in
+      --dirname) show_dirname=1 ;;
+      --fail) fail=1 ;;
+      -P|--resolved) resolved=1 ;;
+      --*)
+        parse "${arg}"
+        fromman "$0" "$@" || exit 0 ;;
+      *) path="${arg}" ;;
+    esac
+  done
+
+  path="${path:-.}"
+
+  if [ -d "${path}" ]; then
+    cd "${path}" 2>/dev/null || die Directory not Found: "${path}"
+  elif [ -L "${path}" ] && [ "${resolved-}" ]; then
+    while [ -L "${path}" ]; do
+      path="$(readlink "${path}")"
+    done
+    dirname="$(dirname "${path}")"
+    cd "${dirname}" 2>/dev/null || die Directory not Found: "${dirname}"
+    basename="$(basename "${path}")"
+  elif [ -f "${path}" ]; then
+    dirname="$(dirname "${path}")"
+    cd "${dirname}" 2>/dev/null || die Directory not Found: "${dirname}"
+    basename="$(basename "${path}")"
+  else
+    [ ! "${fail-}" ] || die Directory or File not Found: "${path}"
+    dirname="$(dirname "${path}")"
+    cd "${dirname}" 2>/dev/null || die Directory not Found: "${dirname}"
+    basename="$(basename "${path}")"
+  fi
+
+  if [ "${resolved-}" ]; then
+    dirname="$(pwd -P)";
+  else
+    dirname="$(pwd)"
+  fi
+
+  if [ "${basename-}" ] && [ "${show_dirname-}" ]; then
+    echo "${dirname}"
+  elif [ "${basename-}" ]; then
+    echo "${dirname}/${basename}"
+  elif [ "${show_dirname-}" ]; then
+    dirname "${dirname}"
+  else
+    echo "${dirname}"
+  fi
+}
+
+main "$@"

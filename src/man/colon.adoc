@@ -1,0 +1,96 @@
+:includedir: /usr/local/include/man
+== SYNOPSIS
+
+[verse]
+*{manname}* [_OPTION_]... [_FILE|DIR_] [_VALUE_]
+*{manname}* --base
+*{manname}* --bins [_FILE|DIR_]
+*{manname}* --init
+include::{includedir}/template.adoc[tag=synopsys-information]
+
+== DESCRIPTION
+The *{manname}* command with no arguments will show with export command *cleaned* _$PATH_, _$MANPATH_ and _$INFOPATH_
+variables of directories which do not exist. The output can be used with _eval_.
+When _FILE_ is provided in the _FILE|DIR_ argument, it's parent is used as directory. +
+The default is to _prepend_ the _FILE|DIR_ to _VALUE_. +
+
+The _--base_, _--bins_ and _--init_ options imply
+the _--export_ option and show the output
+for _$PATH_, _$MANPATH_ and _$INFOPATH_, ready for _eval_. +
+
+_MANPAGER=most_ will be also shown when _$MANPATH_ is shown for _eval_ usage and _most_ is installed.
+
+== OPTIONS
+
+*--append*::
+Append _FILE|DIR_ argument (dirname if _FILE_)
+to _VALUE_ argument (if provided, otherwise returns the _FILE|DIR_ argument).
+
+*--base*::
+Shows the base _$PATH_, _$MANPATH_ and _$INFOPATH_ with _/_ and _/usr_
+as top directories to add:
+_/bin_, _/sbin_, _/share/man_ and _/share/info_. +
+It implies the _--export_ option to be used with `eval`.
+
+*--bins*::
+The output (_--export_ option implied) will have _$PATH_, _$MANPATH_ and _$INFOPATH_ updated to be used with _eval_.
+* If *FILE|DIR* argument is a *DIR*, then *DIR* is prepended  to _$PATH_ (unless *DIR* is the top of a git repository).
+* If *FILE|DIR* argument is a *FILE*, then *parent of FILE* is prepended to _$PATH_
+(unless *parent of FILE* is the top of a git repository).
+* _git top_ if no *FILE|DIR* argument is provided
+or parent directory of one of the two previous bullet items is used
+to add: _/bin_, _/sbin_, _/share/man_ and _/share/info_ to _$PATH_,
+_$MANPATH_ (even if directory does not exist, since contents are generated)
+and _$INFOPATH_.
+* If a _./tests_ directory exists, then previous bullet items subdirectories will be added with _./tests/_.
+
+*--export*, *--export=*_[VARIABLE NAME]_::
+Show the output with _export command_ to be used with _eval_ with _VARIABLE NAME_ if provided (default: _$PATH_).
+
+*--init*::
+Shows initial _$PATH_, _$MANPATH_, and _$INFOPATH_. +
+It also shows:  _$TOP_ and _$<REPO_BASENAME>_TOP_ which contain the _git top_ for *{manname}* command. +
+It implies the _--export_ option to be used with `eval`.
+
+*-P*, *--physical*::
+Use physical absolute directories instead of symlink _pwd -P_.
+
+*--remove*::
+Remove _FILE|DIR_ argument (dirname if _FILE_)
+from _VALUE_ argument (if provided, otherwise returns empty).
+
+ifdef::Output[]
+include::/usr/local/include/man/OPTIONS-Output.adoc[]
+endif::[]
+
+== ARGUMENTS
+
+*FILE|DIR*::
+Dirname of _FILE_ will be used if _FILE|DIR_ argument is _FILE_.
+
+*VALUE*::
+Colon type variable value: i.e: "${PATH}"
+
+include::{includedir}/template.adoc[tag=arguments-information]
+
+== EXIT STATUS
+
+*0*::
+Success.
+
+== EXAMPLES
+
+[verse]
+_$_ eval "$(*{manname}* _--base_)"
+_$_ eval "$(*{manname}* _--init_)"
+_$_ eval "$(*{manname}*)"
+_$_ eval "$(*{manname}* _--init -P_)"
+_$_ eval "$(*{manname}* _--bins_)"
+_$_ eval "$(*{manname}* _--bins_ .)"
+_$_ eval "$(*{manname}* _--bins_ "$0")"
+_$_ PATH="$(*{manname}* . "${PATH}")"
+_$_ eval "$(*{manname}* . "${PATH}" _--export_)"
+_$_ PATH="$(*{manname}* _--append_ . "${PATH}")"
+_$_ PATH="$(*{manname}* _--remove_ . "${HOME}")"
+
+include::{includedir}/template.adoc[tag=repository-and-copying]
