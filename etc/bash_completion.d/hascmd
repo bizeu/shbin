@@ -17,3 +17,5 @@ _hascmd() {
 complete -F _hascmd hascmd
 
 
+
+
