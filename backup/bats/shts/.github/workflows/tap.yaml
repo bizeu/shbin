@@ -1,0 +1,39 @@
+name: tap
+
+on:
+  push:
+    tags:
+      - '**'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  tap:
+    name: Bump Homebrew formula
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - id: info
+        run: |
+          echo "::echo::on"
+          formula="${GITHUB_REPOSITORY##*/}" 
+          printf "::set-output name=%s::%s\n" formula "${formula}"
+          printf "::set-output name=%s::%s\n" path "Formula/${formula}.rb"
+          printf "::set-output name=%s::%s\n" url "https://github.com/${GITHUB_REPOSITORY}/archive/${GITHUB_REF}.tar.gz"
+          printf "::set-output name=%s::%s\n" version "${GITHUB_REF#refs/tags/}"
+          printf "::set-output name=%s::%s\n" message "$(git log -1 --pretty=%B) ${formula} ${version}"
+
+      - uses: mislav/bump-homebrew-formula-action@v1
+        with:
+          formula-name: BatsBash
+          formula-path: ${{ steps.info.outputs.path }}
+          homebrew-tap: j5pu/homebrew-tap
+          base-branch: main
+          download-url: ${{ steps.info.outputs.url }}
+          commit-message: ${{ steps.info.outputs.message }}
+        env:
+          COMMITTER_TOKEN: ${{ env.GITHUB_TOKEN }}

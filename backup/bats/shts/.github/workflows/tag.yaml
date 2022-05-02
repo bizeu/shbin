@@ -1,0 +1,29 @@
+name: tag
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ macos-latest, macos-10.15, ubuntu-latest, ubuntu-18.04 ]
+    steps:
+      - uses: actions/checkout@main
+      - uses: Homebrew/actions/setup-homebrew@master
+      - run: make tests
+        
+  tag:
+    needs: [ tests ]
+    runs-on: ubuntu-latest
+    steps:
+      - id: tag
+        uses: j5pu/actions/tag@main

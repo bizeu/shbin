@@ -1,0 +1,32 @@
+#!/bin/sh
+
+: git rev-parse
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT}
+${SCRIPT} [$(git magenta "<path>")]
+
+${SCRIPT} - super project repository basename from file or directory $(git magenta "<path>") \
+in super project or submodule (default: $(git magenta "cwd"))
+--
+h,help    Show help and exit.
+EOF
+}
+
+#######################################
+# git basename
+# Arguments:
+#  [<path>]     path (default: cwd)
+#######################################
+main() { path="$(git ${1:+-C "$(git dirname "$1")"} super)" && basename "${path}"; }
+
+. git-parse.sh; shift
+main "$@"

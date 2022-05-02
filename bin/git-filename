@@ -1,0 +1,31 @@
+#!/bin/sh
+
+: git rev-parse
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT}
+${SCRIPT} $(git magenta "<path>")
+
+${SCRIPT} - filename if $(git magenta "<path>") is not a directory (default: $(git magenta "cwd"))
+--
+h,help    Show help and exit.
+EOF
+}
+
+#######################################
+# git filename
+# Arguments:
+#  [<path>]     path (default: cwd)
+#######################################
+main() { [ "${1-}" ] && [ ! -d "${1:-.}" ] && basename "$1"; }
+
+. git-parse.sh; shift
+main "$@"

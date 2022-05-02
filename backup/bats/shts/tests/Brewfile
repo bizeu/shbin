@@ -1,0 +1,15 @@
+tap "homebrew/bundle"
+tap "homebrew/core"
+tap "bats-core/bats-core"
+
+brew "bash"
+brew "bash-completion@2"
+brew "bats-core", link: false
+brew "bats-core/bats-core/bats-assert"
+brew "bats-core/bats-core/bats-file"
+brew "bats-core/bats-core/bats-support"
+
+if RUBY_PLATFORM[/darwin/]
+  brew "coreutils"
+  brew "parallel"
+end
