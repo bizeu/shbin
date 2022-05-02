@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -eu
+
+: git describe
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# show current latest branch (default behaviour for svu: https://github.com/caarlos0/svu)
+# Arguments:
+#   None
+#######################################
+git describe --tags --abbrev=0 --match "*.*.*" "$(git current)"

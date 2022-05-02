@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -eu
+
+: git rev-parse
+
+#######################################
+# latest remote full SHA-1 commit for current branch and upstream
+# Arguments:
+#  None
+#######################################
+git-update
+git rev-parse "@{u}"

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -eu
+
+: git ls-remote
+
+#######################################
+# list remote tags (see also: git-tag-remote for explanation of dereference)
+# Arguments:
+#  None
+#######################################
+git-update
+git ls-remote --refs --tags origin | awk -F '/' '{ print $3 }'

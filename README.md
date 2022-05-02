@@ -1,2 +1,2 @@
-# shbin
+# binsh
 Shell Tool and Scripts

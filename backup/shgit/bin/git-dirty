@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is dirty, has untracked or not staged changes (needs commit)
+# Arguments:
+#  None
+# Returns:
+#  0 if dirty
+#######################################
+test -n "$(git status --porcelain)"

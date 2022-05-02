@@ -1,5 +1,4 @@
-:Output:
-:includedir: /usr/local/include/man
+:includedir: templates
 == SYNOPSIS
 
 [verse]

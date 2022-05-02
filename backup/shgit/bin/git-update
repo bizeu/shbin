@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+: git fetch
+
+#######################################
+# fetch repository and tags
+# Arguments:
+#  None
+#######################################
+git fetch --quiet --tags

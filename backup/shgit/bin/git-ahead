@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is local repository ahead of remote and needs to be pushed?
+# Arguments:
+#  None
+# Returns:
+#  0 if local repository is ahead of remote
+#######################################
+local="$(git-sha-local)"
+merge="$(git-sha-merge)"
+remote="$(git-sha-remote)"
+[ "${local}" != "${remote}" ] && [ "${local}" != "${merge}" ]  && [ "${remote}" = "${merge}" ]

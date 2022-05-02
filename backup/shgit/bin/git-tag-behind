@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is the latest local tag behind of the latest remote tag?
+# Arguments:
+#  None
+# Returns:
+#  0 if local tag is behind of the remote tag
+#######################################
+v() { sed -e 's/^v//'; }
+remote="$(git-tag-remote | v)"
+
+! git-tag-synced && [ "${remote}" = "$(printf "%s\n" "$(git-current | v)" "${remote}" | sort -V | tail -1)" ]

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# syncs a repository if not conflicts
+# Arguments:
+#   1  message (default: auto generated)
+# Returns:
+#   1 if diverged or uncommitted changes and behind upstream
+#######################################
+git-conflict
+git-all "$@"
+! git-ahead || git push --quiet
+# TODO: añade 6 segundos lo de los tags y no se si es necesario
+! git-tag-ahead || git push --tags --quiet
+! git-behind || git pull --quiet
+! git-tag-behind || git pull --tags --quiet

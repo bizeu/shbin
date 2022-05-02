@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# adds, commits and pushes if not clean, does not check for conflicts (use: git-sync)
+# Arguments:
+#   1  message (default: auto generated)
+#######################################
+! git-dirty || { git add -A && git commit --quiet -m "${1:-auto: $(git-changes | tr '\n' ' ')}" && git push --quiet; }

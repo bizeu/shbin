@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# list remote tags (git tag)
+# Arguments:
+#   None
+#######################################
+git ls-remote --tags origin | awk -F '/' '{ print $3 }'

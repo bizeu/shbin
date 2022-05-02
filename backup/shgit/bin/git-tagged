@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is the latest commit tagged for the current branch?
+# Arguments:
+#  None
+# Returns:
+#  0 if the latest commit is tagged
+#######################################
+git describe --exact-match --tags @ >/dev/null 2>&1

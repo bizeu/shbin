@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+#
+# quick release script base on name of the script [sync, patch, minor, major]
+
+set -eu
+
+cd "$(git rev-parse --show-toplevel)"
+
+# TODO: poner el check que solo se hace el tag en la main branch
+# hacer el git all
+# TODO: aqui lo dejo, hacer lo de git-all, git-minor, git-major, git-patch (if main)
+is_bump() { is_publish && [ "${current}" != "${next}" ]; }
+is_publish() { [ "${script}" != "push" ]; }
+is_python() { [ -f setup.cfg ]; }
+owner_name() { gh repo view --json nameWithOwner --jq .nameWithOwner; }
+
+msg() {
+  suffix="${next}"
+  case "${script}" in
+    patch) msg=fix ;;
+    minor) msg=feat ;;
+    major) msg="feat!" ;;
+    *) msg=auto; suffix="$(git diff --name-status -r | awk '{print $2}' | tr '\n' ' ')" ;;
+  esac
+  echo "${msg}: ${1:-${suffix}}"
+}
+
+venv() {
+  is_python || return 0
+  test -f ./venv/bin/activate || python3 -m venv venv
+  grep -q '.pyenv' ./venv/bin/activate || echo 'eval $$\(pyenv init --path)' >> ./venv/bin/activate
+  . ./venv/bin/activate
+}
+
+main() {
+  current="$(git-current)"
+  script="${0##*/}"
+  next="$(git-next)"
+  git-sync "$@"
+}
+
+main "$@"
+
+make tests
+
+
+current="$(svu)"
+next="$(svu next)"
+[ "${current}" != "${next}" ] || exit 0
+
+main "$@"
+: '
+DIRTY (only) (same tags) - test with touch and with modified files
+=====
+git dirty  # 0
+git uptodate # 0
+git behind # 1
+git ahead  # 1
+git diverged # 1
+git conflict # 0
+git synced # 1
+
+git-tag-ahead # 1
+git-tag-behind # 1
+git-tag-synced # 0
+
+CLEAN (same tags)
+=====
+git dirty  # 1
+git uptodate # 0
+git behind # 1
+git ahead  # 1
+git diverged # 1
+git conflict # 0
+git synced # 0
+
+git-tag-ahead # 1
+git-tag-behind # 1
+git-tag-synced # 0
+
+BEHIND (only) (same tags)
+=====
+git dirty  # 1
+git uptodate # 1
+git behind # 1
+git ahead  # 0
+git diverged # 1
+git conflict # 0
+git synced # 1
+
+git-tag-ahead # 1
+git-tag-behind # 1
+git-tag-synced # 0
+'

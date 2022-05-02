@@ -1,0 +1,104 @@
+#!/bin/sh
+
+# TODO: hacer el git config estático pero incluir fichero para lo dinámico de los credentials
+#
+# run pull/pull if needed or exit with error if diverged
+
+set -eu 
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+die() {
+  >&2 echo "$0: ${PWD}: $*"
+  exit 1
+}
+
+dirty() {
+    git all-added || needs add
+    git all-committed || needs commit
+}
+
+needs() {
+  >&2 printf "%s" "$(tput bold)$(tput setaf 1)x$(tput sgr0) "
+  echo "git -C \"$(git rev-parse --show-toplevel)\" $*"
+  exit 1
+}
+
+tags() {
+  if [ "${LOCAL_TAG_LAST}" != "${REMOTE_TAG_LAST}" ]; then
+    if ! echo "${LOCAL_TAGS}" | grep -q "${REMOTE_TAG_LAST}"; then
+      needs pull --tags
+    elif ! echo "${REMOTE_TAGS}" | grep -q  "${LOCAL_TAG_LAST}"; then
+      needs push --tags
+    fi
+  fi
+}
+
+pull() {
+  if [ ! "${tag-}" ] && [ ! "${latest_remote-}" ]; then
+    needs pull
+  elif [ ! "${tag-}" ] && [ "${latest_remote-}" ]; then
+    needs pull --tags
+  elif [ "${tag-}" ] && [ ! "${latest_remote-}" ]; then
+    needs pull  # This is a kind of diverge
+  elif echo "${tag}" | grep -q "${latest_remote}"; then
+    needs pull
+  else
+    needs pull --tags
+  fi
+}
+
+push() {
+  if [ ! "${tag_remote-}" ] && [ ! "${latest-}" ]; then
+    needs push
+  elif [ ! "${tag_remote-}" ] && [ "${latest-}" ]; then
+    needs push --tags
+  elif [ "${tag_remote-}" ] && [ ! "${latest-}" ]; then
+    needs push  # This is a kind of diverge
+  elif echo "${tag_remote}" | grep -q "${LOCAL_TAG_LAST}"; then
+    needs push
+  else
+    needs push --tags
+  fi
+}
+
+# @     current local branch
+# @{u}  its upstream branch
+# HEAD or @, git fetch if there are changes, or:
+# REMOTE=$(git rev-parse @{u})
+main() {
+  for arg; do
+    case "${arg}" in
+      --tags)
+        latest="$(git latest)"
+        latest_remote="$(git latest-remote)"
+        tag="$(git tag)"
+        tag_remote="$(git tag-remote)"
+        ;;
+    esac
+  done
+
+  [ -z "$(git status -s)" ] || die "Dirty Repository"
+  local="$(git rev-parse @)"
+  remote="$(git ls-remote origin HEAD | awk '{ print $1 }')"
+
+  if [ "${local}" = "${remote}" ]; then
+    dirty
+    git all-pushed || push
+  elif [ "${local}" != "${remote}" ]; then
+    git fetch --quiet --tags
+    base=$(git merge-base @ '@{u}')
+    if [ "${local}" = "${base}" ] && [ -n "$(git status -s)" ]; then
+      needs stash  # needs stash before pulling
+    elif [ "${local}" = "${base}" ]; then
+      needs pull
+    elif [ "${remote}" = "${base}" ]; then
+      dirty
+      push
+    else
+      die "Diverge: Local Commit ${local}, Merge Base ${base} <= Remote Commit${remote}"
+    fi
+  fi
+}
+
+main "$@"

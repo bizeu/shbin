@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# bashsupport disable=BP5008
+
+current() { strip_prefix "$1"; }
+current_remote() { strip_prefix "$2"; }
+
+tag_ahead() { ! tag_sync "$@" && [ "$(current "$@")" = "$(tag_latest "$@")" ]; }
+tag_behind() { ! tag_sync "$@" && [ "$(current_remote "$@")" = "$(tag_latest "$@")" ]; }
+tag_latest() { printf "%s\n" "$(current "$@")" "$(current_remote "$@")" | sort -V | tail -1; }
+tag_sync() { [ "$(current "$@")" = "$(current_remote "$@")" ]; }
+
+strip_prefix() { echo "${1#v}"; }
+version_prefix() { [ "${1::1}" != "v" ] || echo v; }
+
+### Increments the part of the string
+## $1: version itself
+## $2: number of part: 0 – major, 1 – minor, 2 – patch
+increment_version() {
+  local parts
+  mapfile -t parts < <(strip_prefix "$1" | tr '.' '\n')
+  ((parts[$2]++))
+  case "$2" in
+    0) parts[1]=0 ;&
+    1) parts[2]=0 ;;
+  esac
+  echo "$(version_prefix "$1")${parts[0]}.${parts[1]}.${parts[2]}"
+}
+
+main() {
+  tag_ahead "$@" && echo "AHEAD ==> current: $1, current_remote: $2"
+  tag_behind "$@" && echo "BEHIND ==> current: $1, current_remote: $2"
+  tag_sync "$@" && echo "SYNC ==> current: $1, current_remote: $2"
+  true
+}
+
+main "v0.0.0" "v0.0.0"
+main "v0.0.0" "v0.0.1"
+main "v0.0.1" "v0.0.0"
+main "0.0.0" "v0.0.0"
+main "0.0.0" "v0.0.1"
+main "0.0.1" "v0.0.0"
+
+
+increment_version "1.1.1" 2
+increment_version "1.1.1" 1
+increment_version "1.1.1" 0
+increment_version "v1.1.1" 2
+increment_version "v1.1.1" 1
+increment_version "v1.1.1" 0

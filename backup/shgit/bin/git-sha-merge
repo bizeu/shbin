@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -eu
+
+: git merge-base
+
+#######################################
+# best merge full SHA-1 commit for current branch and upstream
+# Arguments:
+#  None
+#######################################
+git-update
+git merge-base @ "@{u}"

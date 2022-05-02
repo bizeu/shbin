@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eu
+
+#######################################
+# shows the local latest tag raised
+# Arguments:
+#   1  part to raise: major, minor, patch (default: patch)
+#######################################
+next "$(git-current)" "$@"

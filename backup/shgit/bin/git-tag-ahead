@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is the latest local tag ahead of the latest remote tag?
+# Arguments:
+#  None
+# Returns:
+#  0 if local tag is ahead of the remote tag
+#######################################
+v() { sed -e 's/^v//'; }
+local="$(git-current | v)"
+
+! git-tag-synced && [ "${local}" = "$(printf "%s\n" "${local}" "$(git-tag-remote | v)" | sort -V | tail -1)" ]

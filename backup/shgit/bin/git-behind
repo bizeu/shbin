@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is local repository behind remote and needs to be pulled?
+# Arguments:
+#  None
+# Returns:
+#  0 if local repo is behind remote
+#######################################
+local="$(git-sha-local)"
+merge="$(git-sha-merge)"
+[ "${local}" != "$(git-sha-remote)" ] && [ "${local}" = "${merge}" ]
+
+

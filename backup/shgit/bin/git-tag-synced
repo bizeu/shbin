@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# is the latest local tag the same as the latest remote tag?
+# Arguments:
+#  None
+# Returns:
+#  0 if local tag is the same as remote tag
+#######################################
+v() { sed -e 's/^v//'; }
+
+[ "$(git-current | v)" = "$(git-tag-remote | v)" ]

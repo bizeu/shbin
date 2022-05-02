@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# checks for conflicts in the current branch, diverged from upstream or uncommitted changes and behind
+# Arguments:
+#   None
+# Returns:
+#   0 if diverged or uncommitted changes and behind upstream
+#######################################
+die() { >&2 printf '%b\n' "\033[1;31m✘\033[0m ${0##*/}: $*"; exit 1; }
+
+! git-diverged || die "Diverged from upstream"
+! git-dirty || ! git-behind || die "Uncommitted changes and behind upstream (stage and push or commit and force)"
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# local and remote are up-to-date, and is clean (no action is needed)
+# Arguments:
+#  None
+# Returns:
+#  0: local and remote are up-to-date, and is clean
+#######################################
+! git-dirty && git-uptodate

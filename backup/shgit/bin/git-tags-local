@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+: git tag
+
+#######################################
+# list local tags
+# Arguments:
+#  None
+#######################################
+git tag --list

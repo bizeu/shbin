@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+#######################################
+# commit
+# Globals:
+#   MSG
+# Arguments:
+#   1
+#######################################
+commit() {
+  if test -n "$(git status --porcelain)"; then
+    git add -A
+    git commit --quiet -m "${MSG}"
+    git push --quiet
+  fi
+}
+
+#######################################
+# fetch repository
+# Arguments:
+#  None
+#######################################
+fetch() { git remote update >/dev/null; }
+
+#######################################
+# skip the n first lines
+# Globals:
+#   KEEP
+# Arguments:
+#   None
+#######################################
+filter() { awk -v k="${KEEP}" '(NR>k)' 2>/dev/null; }
+
+#######################################
+# description
+# Globals:
+#   MSG
+#   NEXT
+# Arguments:
+#   1
+#######################################
+msg(){
+  NEXT="$(svu next)"
+
+  local suffix
+  suffix="${NEXT}"
+
+  case "${SCRIPT}" in
+    patch) MSG=fix ;;
+    minor) MSG=feat ;;
+    major) MSG="feat!" ;;
+    *) MSG=auto; suffix="$(git diff --name-status -r | awk '{print $2}' | tr '\n' ' ')" ;;
+  esac
+
+  MSG="${MSG}: ${1:-${suffix}}"
+}
+
+#######################################
+# create tag and GitHub release
+# Globals:
+#   CHANGED
+#   MSG
+#   NEXT
+# Arguments:
+#  None
+#######################################
+release_create() {
+  [ "$(svu current)" != "${NEXT}" ] || return 0
+  CHANGED=true
+  git tag -a "${NEXT}" "$(git rev-parse --short HEAD)" -m "${MSG}"
+  git push --quiet
+  git push --quiet --tags "${NEXT}"
+  gh release create "${NEXT}" --generate-notes
+}
+
+#######################################
+# delete tag and GitHub release
+# Globals:
+#  OWNER
+#  REPO
+# Arguments:
+#  None
+#######################################
+release_delete() {
+  TAGS_LOCAL="$(git tag --list)"
+  TAGS_REMOTE="$(git ls-remote --tags origin)"
+  local tag
+  while read -r tag; do
+    git tag -d "${tag}"
+    git push --delete origin "${tag}"
+    gh release delete "${tag}" --yes
+  done < <(curl -s "https://api.github.com/repos/${OWNER}/${REPO}/releases" | jq -r .[].tag_name | filter)
+}
+
+#######################################
+# delete tag local and remote if exists
+# Arguments:
+#  1  tag
+#######################################
+tag_delete() {
+
+}
+#######################################
+# description
+# Globals:
+#   CHANGED
+#   KEEP
+#   NEXT
+#   REPOSITORY
+#   SCRIPT
+# Arguments:
+#   1  additional part of the commit message
+#######################################
+main() {
+  local repository
+  mapfile -t repository < <(gh repo view --json nameWithOwner --jq .nameWithOwner | tr '/' '\n')
+
+  CHANGED=false
+  KEEP=3
+  OWNER="${repository[0]}"
+  REPO="${repository[1]}"
+  SCRIPT="${0##*/}"
+
+  make tests
+  make build &>/dev/null
+
+  msg "$@"
+  commit "$@"
+  fecth
+  release_create
+  release_delete
+}
+
+main "$@"

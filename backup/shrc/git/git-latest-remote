@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# get the latest tag from remote repository (git describe)
+# Create local cloned repo folders like this (https://github.com/erasys/git-describe-remote):
+#   git@github.com:eras/git-describe-remote.git => git-github-com-erasys/git-describe-remote-git
+# Arguments:
+#   None
+#######################################
+url="$(git config remote.origin.url)"
+root="/tmp/${0##*/}"; mkdir -p "${root}"
+path="${root}/$(echo "${url}" | sed 's/[^a-zA-Z0-9]/-/g')"
+
+# Do the initial clone if we need to
+if [ -d "${path}" ]; then
+    git --git-dir="${path}" fetch -q --prune --force origin refs/heads/*:refs/heads/*
+else
+  git clone -q --bare "${url}" "${path}"
+fi
+
+git --git-dir="${path}" latest
+#git --git-dir="${path}" describe --tags --abbrev=0 --match "*.*.*" "$(git current)"

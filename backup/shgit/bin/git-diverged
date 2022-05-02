@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# different commits in local and remote repository, needs to be merged (does not consider staged changes)
+# Arguments:
+#  None
+# Returns:
+#  0 if local and remote are diverged
+#######################################
+local="$(git-sha-local)"
+merge="$(git-sha-merge)"
+remote="$(git-sha-remote)"
+[ "${local}" != "${remote}" ] && [ "${local}" != "${merge}" ]  && [ "${remote}" != "${merge}" ]

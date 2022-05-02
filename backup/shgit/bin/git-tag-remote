@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -eu
+
+: git describe
+
+#######################################
+# latest local tag for current branch, default to v0.0.0
+#
+# Dereference (https://stackoverflow.com/questions/12938972/what-does-mean-in-git):
+#   remote: v0.2.1^{} on the remote points to the commit object, not the tag object,
+#   local: the commit object locally is on the refs/remotes/origin/HEAD.
+#   local/remote: v0.2.1 points to the tag object, not the commit object.
+# git ls-remote --tags origin
+#  c33e3a3c83acee0bb04c13b24710e68c86c81f09        refs/tags/v0.2.1
+#  34fb7e45effd675202f5e17a2ff63b89fb2b28ca        refs/tags/v0.2.1^{}
+# Arguments:
+#  None
+#######################################
+git tags-remote | awk 'END{ if($1) { print $1 } else { print "v0.0.0" } }'

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# plain list of changed files
+# Arguments:
+#   None
+#######################################
+git diff --name-status -r | awk '{print $2}'

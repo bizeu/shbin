@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+#######################################
+# local and remote are up-to-date (does not consider staged changes)
+# Arguments:
+#  None
+# Returns:
+#  0 if local and remove are up-to-date
+#######################################
+[ "$(git-sha-local)" = "$(git-sha-remote)" ]
