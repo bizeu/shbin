@@ -1,0 +1,45 @@
+#!/bin/sh
+
+: git config
+
+#######################################
+# dirname removing before ':' in case of ssh
+# Arguments:
+#  path
+#######################################
+dir() { basename "$(dirname "${1##*:}")"; exit; }
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT}
+${SCRIPT} [$(git magenta "<remote>")|$(git magenta "<url>")]
+${SCRIPT} $(git magenta "<remote>")
+${SCRIPT} $(git magenta "<url>")
+${SCRIPT} - repository owner from config remote url or url (default: $(git magenta "origin"))
+--
+h,help    Show help and exit.
+EOF
+}
+
+#######################################
+# git owner name
+# Arguments:
+#  [<remote>|<url>]     remote name or url (default: cwd)
+#######################################
+main() {
+  if [ "${1-}" ] && echo "${1-}" | grep -q '/'; then
+    dir "$(echo "$1" | sed 's|https://raw.githubusercontent.com/||g')"
+  else
+    url="$(git url "${1-}")" && dir "${url}"
+  fi
+}
+
+. git-parse.sh; shift
+main "$@"

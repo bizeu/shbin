@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+
+: git config
+
+printf -- "%s" "$(git config --get-color "" "blue bold")$*$(git config --get-color "" reset)"

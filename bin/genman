@@ -136,7 +136,7 @@ main(){
   orgname="$(git owner || { echo "$0: $(pwd): Invalid git owner"; exit 1; })"
   repo="$(git name || { echo "$0: $(pwd): Invalid git repo name"; exit 1; })"
   script="${0##*/}"
-  version=$(semver next || { echo "$0: $(pwd): Invalid next semver" >&2; exit 1; })
+  version=$(svu next || { echo "$0: $(pwd): Invalid next semver" >&2; exit 1; })
 
   tmp="$(mktemp -d)"
 

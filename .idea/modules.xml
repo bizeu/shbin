@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file:///usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" filepath="/usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/shbin.iml" filepath="$PROJECT_DIR$/.idea/shbin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../shgit/.idea/shgit.iml" filepath="$PROJECT_DIR$/../shgit/.idea/shgit.iml" />
     </modules>
   </component>
 </project>
