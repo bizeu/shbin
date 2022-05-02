@@ -65,7 +65,7 @@ fi
   (
     while true; do
       [ ! -f "$1" ] || { echo "${PWD}/$1"; break; }
-      [ "${PWD}" != "${stop:-/}" ] || break
+      [ "${PWD}" != "${stop:-/}" ] || return 1
       cd ..
     done
   )
