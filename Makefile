@@ -15,7 +15,7 @@ head: tests
 	brew postinstall --quiet $(basename)  # brew upgrade can not be done when --HEAD installed
 
 main: tests
-	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && brew upgrade --quiet $(basename)
+	@git add -A && git commit --quiet -a -m "auto" && git push --quiet && brew reinstall --quiet $(basename)
 
 tests: clean
 	@true
