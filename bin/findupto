@@ -50,16 +50,17 @@ EOF
 #    # output:
 #######################################
 main() {
-  case "${2-}" in
-    --home) stop="${HOME}" ;;
-    --super) stop="$(git rev-parse --show-toplevel)" ;;
-    --top) stop="$(git rev-parse --show-toplevel)" ;;
-    *)
-      test -d "${2-}" || { >&2 echo  "${0##*/}: $2: No such directory"; exit 1; }
-      stop="${2:-/}"
-      ;;
-  esac
-
+  if test $# -eq 2; then
+    case "${2-}" in
+      --home) stop="${HOME}" ;;
+      --super) stop="$(git rev-parse --show-toplevel)" ;;
+      --top) stop="$(git rev-parse --show-toplevel)" ;;
+      *)
+        test -d "${2-}" || { >&2 echo  "${0##*/}: $2: No such directory"; exit 1; }
+        stop="${2:-/}"
+        ;;
+    esac
+fi
   help "$@"
 
   (
