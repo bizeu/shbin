@@ -57,7 +57,6 @@ main() {
       --top) stop="$(git rev-parse --show-toplevel)" ;;
       *)
         test -d "${2-}" || { >&2 echo  "${0##*/}: $2: No such directory"; exit 1; }
-        stop="${2:-/}"
         ;;
     esac
 fi
@@ -66,7 +65,7 @@ fi
   (
     while true; do
       [ ! -f "$1" ] || { echo "${PWD}/$1"; break; }
-      [ "${PWD}" != "${stop}" ] || break
+      [ "${PWD}" != "${stop:-/}" ] || break
       cd ..
     done
   )
