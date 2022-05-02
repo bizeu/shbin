@@ -33,6 +33,9 @@ Options:
 
 Commands:
    -h, --help, help   display this help and exit.
+
+Returns:
+  1 if no file was found
 EOF
   exit "${rc:-1}"
 }
@@ -48,6 +51,8 @@ EOF
 #    # output: /tmp/foo/bar/baz
 #    find_up baz /tmp/foo/bar/project
 #    # output:
+#  Returns:
+#    1 if <filename> is not found
 #######################################
 main() {
   if test $# -eq 2; then
