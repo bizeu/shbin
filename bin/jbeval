@@ -1,35 +1,89 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
-# update jetbrains license
+# updates license
 
-for product in IntelliJIdea WebStorm DataGrip PhpStorm CLion PyCharm GoLand RubyMine Rider; do
-  echo "Closing ${product}"
-  pkill -9 -fi "${product}"
-  echo "Resetting trial period for ${product}"
+set -euo pipefail
 
-  echo "removing evaluation key..."
-  rm -rf ~/Library/Preferences/${product}*/eval
+JETBRAINS="${HOME}/JetBrains"
 
-  # Above path not working on latest version. Fixed below
-  rm -rf ~/Library/Application\ Support/JetBrains/${product}*/eval
+cd "${JETBRAINS?}"
 
-  echo "removing all evlsprt properties in options.xml..."
-  sed -i '' '/evlsprt/d' ~/Library/Preferences/${product}*/options/other.xml
+JETBRAINS_APPLICATIONS="$(find Applications -type d -mindepth 1 -maxdepth 1 -exec basename "{}" \;)"
 
-  # Above path not working on latest version. Fixed below
-  sed -i '' '/evlsprt/d' ~/Library/Application\ Support/JetBrains/${product}*/options/other.xml
+JETBRAINS_CONFIG="${PWD}/config"
 
-  echo
+JETBRAINS_CONFIGS="$(find "${JETBRAINS_CONFIG}" -type d -mindepth 1 -maxdepth 1 -exec basename "{}" \;)"
+
+declare -A OPEN
+for i in ${JETBRAINS_APPLICATIONS}; do
+  name="${i/.app/}"
+  OPEN["${i}"]="${JETBRAINS}/$(find "Applications/${i}" -type f -name "${name,,}" -o -name "${name,,}.sh")"
 done
 
-echo "removing additional plist files..."
-rm -f ~/Library/Preferences/com.apple.java.util.prefs.plist
-rm -f ~/Library/Preferences/com.jetbrains.*.plist
-rm -f ~/Library/Preferences/jetbrains.*.*.plist
+main() {
+  local file i tmp
+  open https://account.jetbrains.com/login
+  read -n 1 -s -r -p "Safari: delete account, cookies and web form ⌘, [press any key to continue]: "
+  echo
 
-echo "restarting cfprefsd"
-killall cfprefsd
+  open /System/Applications/Utilities/Keychain\ Access.app/
+  read -n 1 -s -r -p "Keychain <-: delete JetBrains account [press any key to continue]: "
+  echo
 
-echo
-echo "That's it, enjoy ;)"
+  for i in "${!OPEN[@]}"; do
+    open "${OPEN["${i}"]}"
+    read -n 1 -s -r -p "${i}: 'Manage Licenses...' ⇧⌘A and log out [press any key to continue]: "
+    echo
+  done
+  
+  for i in ${JETBRAINS_CONFIGS} Toolbox; do
+    pkill -9 -f "${i}" 2>/dev/null || true
+    pkill -9 -f "${i,,}" 2>/dev/null || true
+  done
+
+  for i in accounts.json download logs statistics; do
+    rm -rf ~/.local/share/JetBrains/Toolbox/"${i}"
+    # TODO: macOS
+  done
+
+  rm -f ~/Library/Preferences/com.apple.java.util.prefs.plist
+  sudo rm -rf ~/.java/.userPrefs
+
+  cd "${JETBRAINS_CONFIG}"
+  find . -type f -mindepth 2 -maxdepth 2 -name "*.key" -delete
+  find . -type f -mindepth 2 -maxdepth 2 -name "*.license" -delete
+  find . -type f -mindepth 2 -maxdepth 2 -name "port" -delete
+  find . -type f -mindepth 2 -maxdepth 2 -name "port.lock" -delete
+  find . -type f -mindepth 2 -maxdepth 2 -name "user.web.token" -delete
+  tmp="$(mktemp)"
+  while read -r file; do
+    sed '/evlsprt/d' "${file}" >"${tmp}"
+    cp "${tmp}" "${file}"
+  done < <(find . -type f -path "*/options/other.xml")
+  rm -rf ~/.config/JetBrains
+  rm -f ~/Library/Preferences/com.jetbrains.*.plist
+  rm -f ~/Library/Preferences/jetbrains.*.*.plist
+  killall cfprefsd 2>/dev/null || true
+  rm -f ~/.cache/log/JetBrains/*/token
+  
+  open https://www.icloud.com/mail/
+  read -n 1 -s -r -p "iCloud: remove email alias and create new email alias [press any key to continue]: "
+  echo
+
+  open https://account.jetbrains.com/login
+  read -n 1 -s -r -p "Safari: creeate new account [press any key to continue]: "
+  echo
+
+  open https://www.icloud.com/mail/
+  read -n 1 -s -r -p "iCloud: confirm email [press any key to continue]: "
+  echo
+
+  for i in "${!OPEN[@]}"; do
+    open "${OPEN["${i}"]}"
+    read -n 1 -s -r -p "${i}: login with the new account [press any key to continue]: "
+    echo
+  done
+}
+
+main "$@"
