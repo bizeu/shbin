@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# checks if all untracked files are added to the index and changes are committed, "git add" and "git commit" not needed
+# Arguments:
+#   None
+# Returns:
+#   1 if clean and not "git add" and/or "git commit" is needed.
+#   0 if files need to be added to the index ("git add") and/or files in the index need to be committed ("git commit")
+#######################################
+test -z "$(git status --porcelain)"

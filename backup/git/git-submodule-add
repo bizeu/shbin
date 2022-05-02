@@ -1,0 +1,48 @@
+#!/bin/sh
+
+: git submodule
+
+# TODO: Aqui lo dejo sacar la default branch de remote y pasar los aliases y el git all
+#   etc.
+#   y el commands.
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT} $(git magenta "<url>") [$(git magenta "<path>")]
+${SCRIPT} $(git magenta "<url>")
+
+${SCRIPT} - Add submodule with name from $(git magenta "<url>") basename \
+(default: $(git magenta "<name>")).
+                    With default remote $(git magenta "branch") and $(git magenta "merge") update strategy.
+
+                    Examples:
+                      $ ${SCRIPT} https://github.com/bats-core/bats-core $(git green '=>') $(git magenta "bats-core")
+                      $ ${SCRIPT} https://github.com/bats-core/bats-core \
+$(git magenta "share/bats-core") $(git green '=>') $(git magenta "share/bats-core")
+--
+h,help    Show help and exit.
+EOF
+}
+
+#######################################
+# git submodule add
+# Arguments:
+#  <url>        remote url
+# [<path>]      relative directory including repository name (default: url basename).
+#######################################
+main() {
+  name="$(basename "$1" .git)"
+  path="${2:-${name}}"
+
+  git submodule status "${name}" >/dev/null 2>&/dev/null || \
+    git submodule add --quiet --name "${name}" --branch "$(git default "$1")" "$1" "${path}"
+}
+. git-parse.sh; shift
+main "$@"

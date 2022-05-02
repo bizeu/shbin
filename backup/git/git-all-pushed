@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# checks if there are local commits are pushed to the remote (up-to-date/not ahead), "git push" is not needed.
+# Arguments:
+#   None
+# Returns:
+#   0 if up-to-date and no "git push" is needed
+#   1 if is not up-to-date and "git push" is needed
+#######################################
+tmp="$(mktemp)"
+git push --tags --dry-run > "${tmp}"
+grep -q 'Everything up-to-date' "${tmp}"

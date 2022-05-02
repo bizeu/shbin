@@ -1,0 +1,36 @@
+#!/bin/sh
+
+set -eu
+
+: git commit
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# checks if there are no untracked files, "git add" is not needed
+# Arguments:
+#   None
+# Returns:
+#   0 if there are no untracked files (all added) and "git add" is not needed.
+#   1 if there are untracked files and "git add" is needed.
+#######################################
+test -z "$(git ls-files --others --exclude-standard)"
+
+git ls-files --others --exclude-standard | sort > /tmp/ls-files # 5765
+git add --all --dry-run | awk '{ print $2 }' | sort | sed "s/'//g" > /tmp/add  # 5775
+git status --porcelain
+# Only untracked
+git ls-files --others --exclude-standard
+git ls-files --others --exclude-standard -z | xargs -0 git add
+git ls-files --others --exclude-standard | sed "s/^/'/g;s/$/'/g" | sort > /tmp/ls-files # 5765
+git add --all --dry-run | awk '{ print $2 }' | sort > /tmp/add  # 5775
+comm -1 /tmp/add /tmp/ls-files
+comm -2 /tmp/add /tmp/ls-files
+comm -3 /tmp/add /tmp/ls-files
+# Only uncommitted
+git status --porcelain -uno
+
+git all-added || git add --quiet .
+git all-committed || git commit --quiet -a -m "${MESSAGE:-auto}" "$@"
+git all-pushed || git push --quiet
+

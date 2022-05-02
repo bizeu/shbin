@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -eu
+
+: git branch
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# show current branch
+# Arguments:
+#   None
+#######################################
+git branch --show-current

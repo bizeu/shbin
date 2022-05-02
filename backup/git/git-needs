@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# checks if there are either: unadded (untracked files), uncommitted or "unpushed" (ahead)
+# Arguments:
+#   None
+# Returns:
+#   0 if either: add, commit or push is needed
+#   1 if nothing is needed
+#######################################
+git is-dirty || git unpushed

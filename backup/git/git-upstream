@@ -1,0 +1,4 @@
+#!/bin/sh
+git rev-parse --abbrev-ref --symbolic-full-name "@{u}"
+git rev-parse --abbrev-ref --symbolic-full-name "@"
+git rev-parse --abbrev-ref --symbolic-full-name HEAD

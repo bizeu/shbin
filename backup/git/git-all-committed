@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# checks if all files and changes in the index are committed, "git commit" is not needed (does not if all added)
+# Arguments:
+#   None
+# Returns:
+#   0 if all files and changes on the index are committed, "git commit" is not needed.
+#   1 if files in the index need to be committed, "git commit" is needed
+#######################################
+test -z "$(git status --porcelain -uno)"

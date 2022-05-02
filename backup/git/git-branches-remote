@@ -1,0 +1,14 @@
+#!/bin/sh
+
+: git branch
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+#######################################
+# display remote branches
+# Arguments:
+#   None
+#######################################
+git branch --remotes --format='%(refname:short)' "$@"

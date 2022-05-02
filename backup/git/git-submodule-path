@@ -1,0 +1,48 @@
+#!/bin/sh
+
+: git submodule
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT} $(git magenta "<submodule name>")
+${SCRIPT} $(git magenta "<submodule name>") [--absolute]
+${SCRIPT} $(git magenta "<submodule name>") --absolute
+
+${SCRIPT} - relative of absolute physical path of submodule from .gitmodules
+--
+h,help    Show help and exit.
+
+absolute!    Add git path to relative directory.
+EOF
+}
+
+#######################################
+# git submodule path
+# Arguments:
+#  <submodule name>       path (default: cwd)
+#  [--absolute]           absolute path
+#######################################
+main() {
+  while test $# != 0; do
+    case "$1" in
+      --absolute) top="$(git super)" ;;
+      --) shift; break ;;
+    esac
+    shift
+  done
+
+  name="${1?"$(required "<submodule name>")"}"
+
+  path="$(git config -f .gitmodules submodule."${name}".path)" && echo "${top:+${top}/}${path}"
+}
+
+. git-parse.sh
+main "$@"
+

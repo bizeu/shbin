@@ -1,0 +1,72 @@
+#!/bin/sh
+
+set -eu
+
+: git commit
+
+PATH="$(
+  cd "$(dirname "$0")"
+  pwd -P
+):${PATH}"
+
+#######################################
+# git spec
+# Globals:
+#   COLOR_SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${COLOR_SCRIPT} [$(git blue "ARGUMENT")] [$(git blue "<pathspec>...")]
+${COLOR_SCRIPT} [$(git red "--fix")|$(git red "--fix=")<message>|$(git red "--fix") $(git red "--message=")\
+<message>|$(git red "--fix=") $(git red "--message=")<message>]
+${COLOR_SCRIPT} [$(git red "--feat")|$(git red "--feat=")<message>|$(git red "--feat") $(git red "--message=")\
+<message>|$(git red "--feat=") $(git red "--message=")<message>]
+${COLOR_SCRIPT} [$(git red "--fix!")|$(git red "--fix!=")<message>|$(git red "--fix!") $(git red "--message=")\
+<message>|$(git red "--fix!=") $(git red "--message=")<message>]
+${COLOR_SCRIPT} [$(git red "--feat!")|$(git red "--feat!=")<message>|$(git red "--feat!") $(git red "--message=")\
+<message>|$(git red "--feat!=") $(git red "--message=")<message>]
+${COLOR_SCRIPT} [$(git red "--message=")<message>|$(git red "--message") <message>|$(git red "-m")<message>]
+
+${SCRIPT} - add, commit and push  $(git blue "all") changes, or files that match the $(git blue "pathspec") \
+to a git repository if dirty
+
+--
+h,help          Show help and exit.
+fix?message     $(git magenta "Patch") Version: prefix $(git red "fix: ") to either: option value, \
+$(git red "--message") option value or default commit message.
+feat?message    $(git magenta "Minor") Version: prefix $(git red "feat: ") to either: option value, \
+$(git red "--message") option value or default commit message.
+feat!,fix!?message  $(git magenta "Major") Version: prefix $(git red "feat!: ") or $(git red "fix!: ") \
+to either: option value, $(git red "--message") option value or default commit message.
+m,message=message  Commit message, appended to $(git red "feat"), $(git red "feat!"), $(git red "fix") \
+or $(git red "fix!") if used with no value, or sets the commit message.
+EOF
+}
+
+#######################################
+# adds all files to the index ("git add"), commits all changes and push the commit if needed.
+# Globals:
+#   GIT_MESSAGE
+# Arguments:
+#   None
+# Commands:
+#   git ls-files --deleted --modified --others --exclude-standard | wc -l  # 5777
+#   git add --all --dry-run  | wc -l  # 5777
+#   git status --porcelain --untracked=all | wc -l  # 5777
+#######################################
+main() {
+  . git-parse.sh; shift
+
+  ! git clean || return 0
+  if [ "$#" -eq 0 ]; then
+    git add --all
+    git commit -m "${GIT_MESSAGE:-auto}" && git push
+  else
+    git add "$@"
+    { git commit -m "${GIT_MESSAGE:-auto}" "$@" 2>/dev/null && git push; } || true
+  fi
+}
+
+main "$@"

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+: git config
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT}
+${SCRIPT} $(git magenta "<remote>")
+
+${SCRIPT} - expand the git config $(git magenta "<remote>") url with "url.<base>.insteadOf" config setting
+                i.e.: $(git magenta "ssh://git@github.com/<user>/<repo>.git")
+--
+h,help      Show help and exit.
+EOF
+}
+
+#######################################
+# git insteadOf url
+# Arguments:
+#  [<remote>]     remote name (default: origin)
+#######################################
+main() { git ls-remote --get-url "${1:-origin}"; }
+
+. git-parse.sh; shift
+main "$@"

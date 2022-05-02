@@ -1,0 +1,233 @@
+#!/bin/sh
+# shellcheck disable=SC2016,SC2034
+
+: git config
+
+#######################################
+# main config values
+# Globals:
+#   branch
+#   file
+#   template
+# Arguments:
+#  None
+#######################################
+aliases () {
+  return
+  file='--system'
+  update alias.basename '! : git rev-parse; git super | grep -m 1 "^.*" | xargs basename'
+  update alias.basename-if-file '! if [ -d "${1:-.}" ]; then echo . ; else basename "${1:-.}"; fi #'
+  update alias.dirname-if-file '! if [ -d "${1:-.}" ]; then echo "${1:-.}"; else dirname "${1:-.}"; fi #'
+  update alias.is '! git top >/dev/null 2>&1 #'
+  update alias.name '! : git config; git url | xargs -I {} basename {} .git | filefirst #'
+  update alias.submodule-path '! f() { : git config; git config -f .gitmodules "submodule.$1.path"; }; f'
+  update alias.super '! : git rev-parse; git ${1:+-C "$(git dirname-if-file "$1")"} \
+    rev-parse --show-superproject-working-tree --show-toplevel \
+    "$(git basename-if-file "${1-}")" | filefirst #'
+  update alias.superproject '! : git rev-parse; git ${1:+-C "$(git dirname-if-file "$1")"} \
+    rev-parse --show-superproject-working-tree \
+    "$(git basename-if-file "${1-}")" | filefirst | xargs realpath | filefirst #'
+  update alias.top '! : git rev-parse; git ${1:+-C "$(git dirname-if-file "$1")"} \
+    rev-parse --show-toplevel \
+    "$(git basename-if-file "${1-}")" | filefirst #'
+  update alias.url 'config --get remote.origin.url'
+}
+
+#######################################
+# main config values
+# Globals:
+#   branch
+#   file
+#   template
+# Arguments:
+#  None
+#######################################
+config () {
+  file='--system'
+  update advice.addIgnoredFile false
+
+  update color.branch auto
+  update color.branch.remote yellow
+  update color.decorate auto
+  update color.diff auto
+  update color.grep auto
+  update color.interactive auto
+  update color.pager true
+  update color.showbranch auto
+  update color.status auto
+  update color.status.added green
+  update color.status.changed 'red bold'
+  update color.status.untracked 'magenta bold'
+  update color.ui true
+
+  update core.autocrlf input
+  update core.editor vi
+  update core.filemode true
+  update core.sshCommand /usr/bin/ssh
+
+  update diff.colorMoved zebra
+
+  update fetch.prune true
+  update fetch.pruneTags true
+
+  update git-extras.default-branch "${DEFAULT_BRANCH}"
+
+  update help.autocorrect 0
+
+  update http.postBuffer 157286400
+
+  update init.defaultBranch "${DEFAULT_BRANCH}"
+  update init.templateDir "${GIT_TEMPLATE_DIR}"
+
+  update pager.branch false
+  update pager.tag false
+
+  update pull.rebase false
+
+  update push.default current
+
+  update receive.denyNonFastForwards true
+  update receive.fsckObjects true
+
+  update tag.sort creatordate
+
+  update user.name root
+  update user.email root@example.com
+  update user.username root
+}
+
+#######################################
+# credential config values
+# Globals:
+#   GITHUB_RUN_ID
+#   MACOS
+#   VGA
+#   file
+#   gcm
+# Arguments:
+#  None
+#######################################
+credential() {
+  # TODO: cask broken (tap "microsoft/git", cask "git-credential-manager-core")
+  gcm=/usr/local/share/gcm-core/git-credential-manager-core
+  # TODO: https://stackoverflow.com/questions/14754762/can-gitconfig-options-be-set-conditionally
+  if [ ! "${GITHUB_RUN_ID-}" ]; then
+    if git ping; then
+      update url.ssh://git@github.com/.insteadOf https://github.com/
+    fi
+    if test -x "${gcm}"; then
+      update credential.helper "${gcm}"
+      update credential."https://dev.azure.com".useHttpPath true
+    elif [ "$(git config --system credential.helper)" = "${gcm}" ]; then
+      sudo git config --system --unset-all credential.helper \
+        && echo "$(git yellow "‼") $(git italic "GIT Config System:") Removed =$(git blue "＞") credential.helper"
+      sudo git config --system --unset-all credential."https://dev.azure.com".useHttpPath \
+        && echo "$(git yellow "‼") $(git italic "GIT Config System:") \
+Removed =$(git blue "＞") credential.\"https://dev.azure.com\".useHttpPath"
+    fi
+    if [ "${MACOS}" -eq 1 ]; then
+      update credential.credentialStore keychain
+    elif [ "${VGA}" -eq 1 ]; then
+      update credential.credentialStore secretservice
+    else
+      update credential.credentialStore plaintext
+    fi
+  fi
+}
+
+#######################################
+# git spec
+# Globals:
+#   SCRIPT
+# Arguments:
+#  None
+#######################################
+spec() {
+  cat <<EOF
+${SCRIPT}
+${SCRIPT} [$(magenta "--force")]
+
+${SCRIPT} - updates git system config and git templates
+--
+h,help    Show help and exit.
+
+ Actions:
+force!  Remove gitconfig and templates before updating.
+EOF
+}
+
+#######################################
+# template directory
+# Globals:
+#   branch
+#   file
+#   msg
+#   remote
+#   template
+# Arguments:
+#  None
+#######################################
+template () {
+  msg="Template Config"
+  update "branch.${DEFAULT_BRANCH}.remote" "${DEFAULT_REMOTE}"
+  update "branch.${DEFAULT_BRANCH}.merge" "refs/heads/${DEFAULT_BRANCH}"
+  update core.bare false
+  update core.filemode true
+  update core.ignorecase true
+  update core.logallrefupdates true
+  update core.precomposeunicode true
+  update core.repositoryformatversion 0
+  [ -f  "${GIT_TEMPLATE_DIR}/HEAD" ] || \
+    { echo "ref: refs/heads/${DEFAULT_BRANCH}" | sudo tee "${GIT_TEMPLATE_DIR}/HEAD" >/dev/null \
+    && echo "$(git green "✔") $(git italic "GIT Template File:") ${GIT_TEMPLATE_DIR}/HEAD"; }
+}
+
+#######################################
+# updates the config
+# Globals:
+#   command
+#   file
+#   msg
+#   previous
+# Arguments:
+#   1
+#   2
+#######################################
+update () {
+  command="sudo git config --file=${GIT_CONFIG_SYSTEM:-${GIT_TEMPLATE_DIR}/config} $1"
+  previous="$(${command} || true)"
+  if [ "${previous}" != "$2" ]; then
+    ${command} "$2" \
+      && echo "$(git green "✔") $(git italic "GIT ${msg:-System Config}: $1:") ${previous} =$(git blue "＞") $2"
+  fi
+}
+
+#######################################
+# git system config and template
+# Globals:
+#   arg
+#   template
+# Arguments:
+#  None
+#######################################
+main() {
+  for arg; do
+    case "${arg}" in
+      --force)
+        sudo rm -rf "${GIT_CONFIG_SYSTEM}" "${GIT_TEMPLATE_DIR}"/*
+        Warning GIT Config System: Removed
+        ;;
+      --) : ;;
+    esac
+  done
+
+  sudo mkdir -p "${GIT_TEMPLATE_DIR}"
+  config
+  credential
+
+  unset GIT_CONFIG_SYSTEM
+  template
+}
+
+. git-parse.sh
+main "$@"

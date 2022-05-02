@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#
+# Git Clone or Pull or Push
+
+tmp=/tmp/bats-suite
+if test -d "${tmp}"; then
+  git -C "${tmp}" cpp
+else
+  git -C /tmp clone https://github.com/j5pu/rc
+fi

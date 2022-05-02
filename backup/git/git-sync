@@ -1,0 +1,49 @@
+#!/bin/sh
+
+#
+# run pull/pull if needed or exit with error if diverged
+
+set -eu
+
+PATH="$(cd "$(dirname "$0")"; pwd -P):${PATH}"
+
+die() {
+  >&2 echo "$0: ${PWD}: $*"
+  exit 1
+}
+
+main() {
+  if [ "${LOCAL}" != "${REMOTE}" ] || [ "${LOCAL_TAGS}" != "${REMOTE_TAGS}" ]; then
+    git fetch --quiet
+    git fetch --quiet --prune --tags
+    base=$(git merge-base @ '@{u}')
+    if [ "${LOCAL}" = "${base}" ] && [ -n "$(git status -s)" ]; then
+      die "Dirty Repository and Commits in Remote (behind) - stage changes and pull or ...: "
+    elif [ "${LOCAL}" = "${base}" ]; then
+      git pull --quiet
+    elif [ "${REMOTE}" = "${base}" ]; then
+      test -z "$(git ls-files --others --exclude-standard)" || git add .
+      # TODO: aqui lo dejo, unir el git-parse.sh para el commit message y asi también que este el path, etc.
+      test -z"$(git status --porcelain)" || git commit -a -m "${1-}"
+      git push --quiet
+    else
+      die "Different Commits in both Local and Remote"
+    fi
+  fi
+}
+
+# @     current local branch
+# @{u}  its upstream branch
+LOCAL="$(git rev-parse @)"
+REMOTE="$(git ls-remote origin HEAD | awk '{ print $1 }')"  # HEAD or @, git fetch if there are changes, or:
+# REMOTE=$(git rev-parse @{u})
+# https://github.com/erasys/git-describe-remote
+# git describe --tags --abbrev=0
+LOCAL_TAGS="$(git tag -l)"
+REMOTE_TAGS="$(git ls-remote --tags origin | awk -F '/' '{ print $3 }')"
+
+if [ "${1-}" = '--dry-run' ]; then
+  main "$@"
+else 
+  eval "$(main "$@")"
+fi
