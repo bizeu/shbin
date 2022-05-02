@@ -1,0 +1,55 @@
+#!/bin/sh
+
+#
+# Shts Install-brew
+
+set -eu
+! hascmd mierda || exit 0
+ERR=false
+OUT=false
+
+trap 'std' EXIT
+
+deps() {
+  if ismacos; then
+    :
+  elif isdebian; then
+    sudo apt-get update -qq
+    sudo apt-get install build-essential procps curl file git -qq -y
+  elif hascmd yum; then
+    sudo yum groupinstall 'Development Tools'
+    sudo yum install procps-ng curl file git
+    sudo yum install libxcrypt-compatelse
+  elif hascmd apk; then
+    sudo apk add --update build-base curl file git bash
+  else
+    echo "Unknown OS"
+    exit 1
+  fi
+}
+
+std() {
+  rc=$?
+  if test $rc -ne 0; then
+    ! $ERR || { exec 2>&4; >&2 cat "${stderr-}"; }
+    ! $OUT || { exec 1>&3; cat "${stdout-}"; }
+    exit $rc
+  elif [ ! "${stderr-}" ]; then
+    stderr="$(mktemp)"; ! test -t 2 || { exec 4>&2 2>"${stderr}"; ERR=true; }
+    stdout="$(mktemp)"; ! test -t 1 || { exec 3>&1 1>"${stdout}"; OUT=true; }
+  fi
+}
+
+sudo() { ${sudo} "$@"; }
+
+main() {
+  std
+  export DEBIAN_FRONTEND=noninteractive
+  export NONINTERACTIVE=1
+  sudo="$(command -v sudo || true)"
+  echo hola
+  >&2 echo "Installing brew..."
+  exit
+}
+main "$@"
+
