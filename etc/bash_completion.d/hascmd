@@ -14,5 +14,4 @@ _hascmd() {
   mapfile -t COMPREPLY < <(compgen -b -c -o nospace -W "-h --help help" -- "$2")
 }
 
-ls -la
 complete -F _hascmd hascmd
