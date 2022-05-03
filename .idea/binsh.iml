@@ -9,7 +9,6 @@
     <orderEntry type="jdk" jdkName="Python 3.10 (shbin)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="homebrew-tap" />
-    <orderEntry type="module" module-name="homebrew-bats-core" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="setup.cfg" />

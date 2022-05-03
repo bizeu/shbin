@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/binsh.iml" filepath="$PROJECT_DIR$/.idea/binsh.iml" />
-      <module fileurl="file:///usr/local/Homebrew/Library/Taps/bats-core/homebrew-bats-core/.idea/homebrew-bats-core.iml" filepath="/usr/local/Homebrew/Library/Taps/bats-core/homebrew-bats-core/.idea/homebrew-bats-core.iml" />
       <module fileurl="file:///usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" filepath="/usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" />
     </modules>
   </component>
