@@ -9,5 +9,6 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="/usr/local/Homebrew/Library/Taps/bats-core/homebrew-bats-core" vcs="Git" />
   </component>
 </project>
