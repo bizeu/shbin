@@ -21,7 +21,7 @@ deps() {
     sudo yum install procps-ng curl file git
     sudo yum install libxcrypt-compatelse
   elif hascmd apk; then
-    sudo apk add --update build-base curl file git bash
+    sudo apk add --update build-base curl file git bash sudo
   else
     echo "Unknown OS"
     exit 1
@@ -40,6 +40,40 @@ std() {
   fi
 }
 
+shared() {
+  shared=/Users/Shared
+  user="${USER}"
+  # check can only be root and no sudo
+  export HOMEBREW_NO_ANALYTICS=1
+  export HOMEBREW_PREFIX="${shared}/brew"
+  export PATH="${HOMEBREW_PREFIX}/bin:${PATH}"
+  if ! test -w "${shared}"; then
+    if ! command -v sudo >/dev/null; then
+      user=brew
+      install sudo
+      adduser -D -g "" "${user}"
+      adduser "${user}" sudo
+    fi
+    sudo mkdir -p -m go+w "${shared}"
+    sudo chown -R "${user}:sudo" "${HOMEBREW_PREFIX}"
+  fi
+  git -C "${shared}" clone --quiet https://github.com/Homebrew/brew
+  sudo -u "${user}" brew update --force --quiet
+  chmod -R go-w "$(brew --prefix)/share/zsh"
+}
+
+shared_chown() {
+  export HOMEBREW_NO_ANALYTICS=1
+  export HOMEBREW_PREFIX=/Users/Shared/brew
+  group="admin"; grep -q -E "^${group}:" /etc/group || group="sudo"
+  ${sudo} mkdir -p -m g+w "${HOMEBREW_PREFIX}"
+  ${sudo} chown -R "${USER}:${group}" "${HOMEBREW_PREFIX}"
+  export PATH="${HOMEBREW_PREFIX}/bin:${PATH}"
+  git clone https://github.com/Homebrew/brew "${HOMEBREW_PREFIX}"
+  brew update --force --quiet
+  chmod -R go-w "$(brew --prefix)/share/zsh"
+}
+
 sudo() { ${sudo} "$@"; }
 
 main() {
@@ -49,6 +83,8 @@ main() {
   sudo="$(command -v sudo || true)"
   echo hola
   >&2 echo "Installing brew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
   exit
 }
 main "$@"

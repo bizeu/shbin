@@ -3,7 +3,7 @@
 <plist version="1.0">
   <dict>
     <key>CFBundleExecutable</key>
-    <string>binsh_pycharm</string>
+    <string>pycharm</string>
     <key>CFBundleGetInfoString</key>
     <string>binsh</string>
     <key>CFBundleIconFile</key>

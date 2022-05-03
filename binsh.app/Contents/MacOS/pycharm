@@ -1,0 +1,5 @@
+#!/bin/bash
+
+PROJECT_DIR="$(dirname "${0%.*}")"; export PROJECT_DIR
+export PATH="${PROJECT_DIR}/bin:${PATH}"
+/Applications/PyCharm.app/Contents/MacOS/pycharm "${PROJECT_DIR}"

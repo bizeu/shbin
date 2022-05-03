@@ -1,15 +1,23 @@
 [advice]
   addIgnoredFile = false
+[alias]
+  ls-origin = ls-remote --quiet --exit-code origin
 [color]
+  blue = blue bold
   branch = auto
+  cyan = cyan bold
   decorate = auto
   diff = auto
+  green = green bold
   grep = auto
   interactive = auto
+  magenta = magenta bold
   pager = true
+  red = red bold
   showbranch = auto
   status = auto
   ui = true
+  yellow = yellow bold
 [color "branch"]
   remote = yellow
 [color "status"]
@@ -26,7 +34,6 @@
   colorMoved = zebra
 [fetch]
   prune = true
-#   pruneTags = true
 [git-extras]
   default-branch = main
 [help]

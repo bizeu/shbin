@@ -26,7 +26,7 @@ if test $__PROFILE_D_SOURCED -eq 0; then
   SUDO="$(command -v sudo)"; export SUDO
 
   has() { command -v "$1" >/dev/null; }
-  rebash() { . /etc/profile }
+  rebash() { . /etc/profile; }
 
   i="$(command -v bash)"
   [ ! "${i-}" ] || [ "${SHELL-}" = "$(command -v bash)" ] || [ "${USER}" = "root" ] \
