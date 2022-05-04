@@ -10,5 +10,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../bats" vcs="Git" />
+    <mapping directory="$PROJECT_HOMEBREW_TAP$" vcs="Git" />
   </component>
 </project>

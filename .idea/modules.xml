@@ -6,7 +6,7 @@
       <module fileurl="file:///usr/local/etc/bash_completion.d/.idea/bash_completion.d.iml" filepath="/usr/local/etc/bash_completion.d/.idea/bash_completion.d.iml" />
       <module fileurl="file://$PROJECT_DIR$/../bats/.idea/bats.iml" filepath="$PROJECT_DIR$/../bats/.idea/bats.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/binsh.iml" filepath="$PROJECT_DIR$/.idea/binsh.iml" />
-      <module fileurl="file:///usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" filepath="/usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" />
+      <module fileurl="file://$PROJECT_HOMEBREW_TAP$/.idea/homebrew-tap.iml" filepath="$PROJECT_HOMEBREW_TAP$/.idea/homebrew-tap.iml" />
     </modules>
   </component>
 </project>
