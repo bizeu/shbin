@@ -1,5 +1,9 @@
 # shellcheck disable=SC2046
 # System-wide .profile for sh(1)
+start=$SECONDS
+
+#echo start
+#echo 0: "$(( SECONDS - start ))"
 
 export HOMEBREW_PREFIX="/usr/local"
 
@@ -14,9 +18,19 @@ case ":${PATH}:" in
     ;;
 esac
 
+#echo 1: "$(( SECONDS - start ))"
+
 if [ ! "${CONFIGS-}" ]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
   export CONFIGS="/Users/j5pu/shrc/etc/config"
+  export DOCKER_COMPLETION_SHOW_CONFIG_IDS=yes
+  export DOCKER_COMPLETION_SHOW_CONTAINER_IDS=yes
+  export DOCKER_COMPLETION_SHOW_NODE_IDS=yes
+  export DOCKER_COMPLETION_SHOW_PLUGIN_IDS=yes
+  export DOCKER_COMPLETION_SHOW_SECRET_IDS=yes
+  export DOCKER_COMPLETION_SHOW_SERVICE_IDS=yes
+  export DOCKER_COMPLETION_SHOW_IMAGE_IDS=all
+  export DOCKER_COMPLETION_SHOW_TAGS=yes
   export HOMEBREW_CELLAR="${HOMEBREW_PREFIX}/Cellar"
   export HOMEBREW_NO_ANALYTICS=1
   export HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
@@ -49,8 +63,11 @@ if [ ! "${CONFIGS-}" ]; then
   export STOW_DIR
 
   ! test -f /Users/j5pu/secrets/bin/secrets.sh || . /Users/j5pu/secrets/bin/secrets.sh
-  [ ! "${BASH_VERSINFO-}" ] || [ "${BASH_VERSINFO[0]:-0}" ] || shopt -s inherit_errexit
+
+  [ ! "${BASH_VERSINFO-}" ] || [ "${BASH_VERSINFO[0]:-0}" -lt 4 ] || shopt -s inherit_errexit
 fi
+
+#echo 2: "$(( SECONDS - start ))"
 
 [ "${PS1-}" ] || return 0
 
@@ -65,6 +82,8 @@ if ! alias l >/dev/null 2>&1; then
   ! command -v grc >/dev/null || GRC_ALIASES=true . "${HOMEBREW_PREFIX}/etc/grc.sh"
 fi
 
+#echo 3: "$(( SECONDS - start ))"
+
 ! command -v rebash >/dev/null || return 0
 
 #######################################
@@ -74,19 +93,35 @@ fi
 #######################################
 rebash() { unset CONFIGS && unset -f rebash && . /etc/profile; }
 
-set -o errtrace
+set -o functrace errtrace
 
+# no tiene sentido exportar las funciones si no se pueden exportar las shopt, ademas es un lio
+# depende de la version de bash... no habría solución única
 if [ "${BASH_VERSINFO-}" ]; then
-  shopt -s checkwinsize execfail histappend
-  [ "${BASH_VERSINFO[0]:-0}" -lt 4 ] || shopt -s direxpand
+  # https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps
+  # CTRL+R -> history search, and CTRL+S -> history search backward
+  # $ sudo (I want know completions .. CTRL+A CTRL+R CTRL+Y ... CTRL+R
+  stty -ixon
+  # https://zwischenzugs.com/2019/04/03/eight-obscure-bash-options-you-might-want-to-know-about/
+  shopt -s autocd cdable_vars checkwinsize dotglob execfail extglob histappend nocaseglob nocasematch
+  [ "${BASH_VERSINFO[0]:-0}" -lt 4 ] || shopt -s direxpand dirspell globstar progcomp_alias
   # eval "$(/Users/j5pu/binsh/backup/bats/shts/bin/envfile.sh hook)"
   # eval "$(direnv hook bash)"
   ! command -v pyenv >/dev/null || eval "$(pyenv init -)"
   ! command -v starship >/dev/null || eval "$(starship init bash)"
+  PROMPT_COMMAND="history -a; history -c; history -r${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi
+
+#echo 4: "$(( SECONDS - start ))"
 
 ! test -d "${HOMEBREW_PREFIX}/etc/profile.d" || for i in "${HOMEBREW_PREFIX}/etc/profile.d"/*; do
   . "${i}"
 done; unset i
 
-! command -v compgen >/dev/null || export -f $(compgen -A function)
+#echo 5: "$(( SECONDS - start ))"
+
+! command -v compgen >/dev/null || export -f $(compgen -A function | grep -v '^_')
+
+#echo 6: "$(( SECONDS - start ))"
+
+#echo return

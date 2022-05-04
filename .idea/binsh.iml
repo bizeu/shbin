@@ -10,6 +10,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="homebrew-tap" />
     <orderEntry type="module" module-name="bats" />
+    <orderEntry type="module" module-name="bash-completion@2" />
+    <orderEntry type="module" module-name="bash_completion.d" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="setup.cfg" />

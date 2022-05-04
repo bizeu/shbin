@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file:///usr/local/Cellar/bash-completion@2/.idea/bash-completion@2.iml" filepath="/usr/local/Cellar/bash-completion@2/.idea/bash-completion@2.iml" />
+      <module fileurl="file:///usr/local/etc/bash_completion.d/.idea/bash_completion.d.iml" filepath="/usr/local/etc/bash_completion.d/.idea/bash_completion.d.iml" />
       <module fileurl="file://$PROJECT_DIR$/../bats/.idea/bats.iml" filepath="$PROJECT_DIR$/../bats/.idea/bats.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/binsh.iml" filepath="$PROJECT_DIR$/.idea/binsh.iml" />
       <module fileurl="file:///usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" filepath="/usr/local/Homebrew/Library/Taps/bizeu/homebrew-tap/.idea/homebrew-tap.iml" />

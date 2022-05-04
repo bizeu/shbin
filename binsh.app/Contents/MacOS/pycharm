@@ -2,4 +2,10 @@
 
 PROJECT_DIR="$(dirname "${0%.*}")"; export PROJECT_DIR
 export PATH="${PROJECT_DIR}/bin:${PATH}"
-/Applications/PyCharm.app/Contents/MacOS/pycharm "${PROJECT_DIR}"
+export JEDITERM_USER_RCFILE="/etc/profile"
+contents=/Applications/PyCharm.app/Contents
+jedi="${contents}/plugins/terminal/jediterm-bash.in"
+line="source /etc/profile"
+test "$(cat "${jedi}")" = "${line}" || { mv "${jedi}" "${jedi}.bak" && echo "${line}" >> "${jedi}"; }
+
+"${contents}/MacOS/pycharm" "${PROJECT_DIR}"
