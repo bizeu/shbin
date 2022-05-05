@@ -2,7 +2,7 @@
 
 SHELL := $(shell command -v bash)
 DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-export BASH_ENV := $(DIR).envrc
+export BASH_ENV := /etc/profile
 basename := $(shell basename $(DIR))
 tmp := $(shell mktemp -d)
 
