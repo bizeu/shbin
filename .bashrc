@@ -49,6 +49,7 @@ if [ ! "${CONFIGS-}" ]; then
   export LESS_TERMCAP_us=$'\e[1;4;31m'
   export HOMEBREW_BAT=1
   export HOMEBREW_NO_ENV_HINTS=1
+  export export HOMEBREW_PRY=1
   export INPUTRC="${CONFIGS}/readline/inputrc"
   export PAGER=less
   export PROMPT_COMMAND="history -a; history -c; history -r"
