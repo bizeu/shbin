@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$LIBRARY_HOMEBREW$/.idea/Homebrew.iml" filepath="$LIBRARY_HOMEBREW$/.idea/Homebrew.iml" />
+      <module fileurl="file:///usr/local/Cellar/bash-completion@2/.idea/bash-completion@2.iml" filepath="/usr/local/Cellar/bash-completion@2/.idea/bash-completion@2.iml" />
+      <module fileurl="file:///usr/local/etc/bash_completion.d/.idea/bash_completion.d.iml" filepath="/usr/local/etc/bash_completion.d/.idea/bash_completion.d.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../bats/.idea/bats.iml" filepath="$PROJECT_DIR$/../bats/.idea/bats.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/binsh.iml" filepath="$PROJECT_DIR$/.idea/binsh.iml" />
+      <module fileurl="file://$PROJECT_HOMEBREW_TAP$/.idea/homebrew-tap.iml" filepath="$PROJECT_HOMEBREW_TAP$/.idea/homebrew-tap.iml" />
+    </modules>
+  </component>
+</project>
