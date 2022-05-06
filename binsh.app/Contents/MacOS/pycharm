@@ -1,8 +1,7 @@
 #!/bin/bash
 
 PROJECT_DIR="$(dirname "${0%.*}")"; export PROJECT_DIR
-export PATH="${PROJECT_DIR}/bin:${PATH}"
-export JEDITERM_USER_RCFILE="/etc/profile"
+PATH="$(brew --prefix ruby)/bin:${PROJECT_DIR}/bin:${PATH}"; export PATH
 contents=/Applications/PyCharm.app/Contents
 jedi="${contents}/plugins/terminal/jediterm-bash.in"
 line="source /etc/profile"

@@ -11,7 +11,7 @@ export HOMEBREW_PREFIX="/usr/local"
 case ":${PATH}:" in
   *:/usr/local/bin:*) : ;;
   *)
-    export PATH="${HOMEBREW_PREFIX}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    export PATH="${HOMEBREW_PREFIX}/opt/ruby/bin:${HOMEBREW_PREFIX}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     ! command -v pyenv >/dev/null || eval "$(pyenv init --path)"
     sudo chsh -s "${HOMEBREW_PREFIX}/bin/bash" j5pu &>/dev/null
     sudo chsh -s "${HOMEBREW_PREFIX}/bin/bash" root &>/dev/null
@@ -30,16 +30,20 @@ if [ ! "${CONFIGS-}" ]; then
   export DOCKER_COMPLETION_SHOW_SECRET_IDS=yes
   export DOCKER_COMPLETION_SHOW_SERVICE_IDS=yes
   export DOCKER_COMPLETION_SHOW_IMAGE_IDS=all
-  export DOCKER_COMPLETION_SHOW_TAGS=yes
-  export HOMEBREW_CELLAR="${HOMEBREW_PREFIX}/Cellar"
-  export HOMEBREW_NO_ANALYTICS=1
-  export HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
-  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}:"
-  export INFOPATH="${HOMEBREW_PREFIX}/info:${INFOPATH:-}"
   export DIRENV_CONFIG="${CONFIGS}/direnv"
+  export DOCKER_COMPLETION_SHOW_TAGS=yes
   export GIT_COMPLETION_SHOW_ALL="1"
   export GIT_COMPLETION_SHOW_ALL_COMMANDS="1"
+  export HOMEBREW_BAT=1
+  export HOMEBREW_CELLAR="${HOMEBREW_PREFIX}/Cellar"
+  export HOMEBREW_NO_ANALYTICS=1
+  export HOMEBREW_NO_ENV_HINTS=1
+  export HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
+  export HOMEBREW_PRY=1
+  export INFOPATH="${HOMEBREW_PREFIX}/info:${INFOPATH:-}"
+  export INPUTRC="${CONFIGS}/readline/inputrc"
   export JETBRAINS="${HOME}/JetBrains"
+  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}:"
   export LESS_TERMCAP_mb=$'\e[1;32m'
   export LESS_TERMCAP_md=$'\e[1;32m'
   export LESS_TERMCAP_me=$'\e[0m'
@@ -47,10 +51,6 @@ if [ ! "${CONFIGS-}" ]; then
   export LESS_TERMCAP_so=$'\e[01;33m'
   export LESS_TERMCAP_ue=$'\e[0m'
   export LESS_TERMCAP_us=$'\e[1;4;31m'
-  export HOMEBREW_BAT=1
-  export HOMEBREW_NO_ENV_HINTS=1
-  export export HOMEBREW_PRY=1
-  export INPUTRC="${CONFIGS}/readline/inputrc"
   export PAGER=less
   export PROMPT_COMMAND="history -a; history -c; history -r"
   export PYCHARM_CONFIG="${JETBRAINS}/config/PyCharm"
