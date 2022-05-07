@@ -43,7 +43,6 @@ if [ ! "${CONFIGS-}" ]; then
   export INFOPATH="${HOMEBREW_PREFIX}/info:${INFOPATH:-}"
   export INPUTRC="${CONFIGS}/readline/inputrc"
   export JETBRAINS="${HOME}/JetBrains"
-  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}:"
   export LESS_TERMCAP_mb=$'\e[1;32m'
   export LESS_TERMCAP_md=$'\e[1;32m'
   export LESS_TERMCAP_me=$'\e[0m'
@@ -51,6 +50,8 @@ if [ ! "${CONFIGS-}" ]; then
   export LESS_TERMCAP_so=$'\e[01;33m'
   export LESS_TERMCAP_ue=$'\e[0m'
   export LESS_TERMCAP_us=$'\e[1;4;31m'
+  export MANPAGER=most
+  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}:"
   export PAGER=less
   export PROMPT_COMMAND="history -a; history -c; history -r"
   export PYCHARM_CONFIG="${JETBRAINS}/config/PyCharm"
@@ -96,7 +97,7 @@ rebash() { unset CONFIGS && unset -f rebash && . /etc/profile; }
 
 set -o functrace errtrace
 
-# no tiene sentido exportar las funciones si no se pueden exportar las shopt, ademas es un lio
+# No tiene sentido exportar las funciones si no se pueden exportar las shopt, además es un lío
 # depende de la version de bash... no habría solución única
 if [ "${BASH_VERSINFO-}" ]; then
   # https://www.digitalocean.com/community/tutorials/how-to-use-bash-history-commands-and-expansions-on-a-linux-vps
