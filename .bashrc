@@ -11,7 +11,7 @@ export HOMEBREW_PREFIX="/usr/local"
 case ":${PATH}:" in
   *:/usr/local/bin:*) : ;;
   *)
-    export PATH="${HOMEBREW_PREFIX}/opt/ruby/bin:${HOMEBREW_PREFIX}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    export PATH="${HOMEBREW_PREFIX}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     ! command -v pyenv >/dev/null || eval "$(pyenv init --path)"
     sudo chsh -s "${HOMEBREW_PREFIX}/bin/bash" j5pu &>/dev/null
     sudo chsh -s "${HOMEBREW_PREFIX}/bin/bash" root &>/dev/null
@@ -105,7 +105,8 @@ if [ "${BASH_VERSINFO-}" ]; then
   # $ sudo (I want know completions .. CTRL+A CTRL+R CTRL+Y ... CTRL+R
   stty -ixon
   # https://zwischenzugs.com/2019/04/03/eight-obscure-bash-options-you-might-want-to-know-about/
-  shopt -s autocd cdable_vars checkwinsize dotglob execfail extglob histappend nocaseglob nocasematch
+  # a tomar por culo el extglob que jode todo
+  shopt -s autocd cdable_vars checkwinsize dotglob execfail histappend nocaseglob nocasematch
   [ "${BASH_VERSINFO[0]:-0}" -lt 4 ] || shopt -s direxpand dirspell globstar progcomp_alias
   # eval "$(/Users/j5pu/binsh/backup/bats/shts/bin/envfile.sh hook)"
   # eval "$(direnv hook bash)"
@@ -122,7 +123,7 @@ done; unset i
 
 #echo 5: "$(( SECONDS - start ))"
 
-! command -v compgen >/dev/null || export -f $(compgen -A function | grep -v '^_')
+#! command -v compgen >/dev/null || export -f $(compgen -A function | grep -v '^_')
 
 #echo 6: "$(( SECONDS - start ))"
 
