@@ -22,6 +22,7 @@ esac
 
 if [ ! "${CONFIGS-}" ]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
+  export BATS_NUMBER_OF_PARALLEL_JOBS=400
   export CONFIGS="/Users/j5pu/shrc/etc/config"
   export DOCKER_COMPLETION_SHOW_CONFIG_IDS=yes
   export DOCKER_COMPLETION_SHOW_CONTAINER_IDS=yes
@@ -51,12 +52,9 @@ if [ ! "${CONFIGS-}" ]; then
   export LESS_TERMCAP_ue=$'\e[0m'
   export LESS_TERMCAP_us=$'\e[1;4;31m'
   export MANPAGER=most
-  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}:"
+  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}"
   export PAGER=less
   export PROMPT_COMMAND="history -a; history -c; history -r"
-  export PYCHARM_CONFIG="${JETBRAINS}/config/PyCharm"
-  export PYCHARM_PROPERTIES="${PYCHARM_CONFIG}/.properties"; launchctl setenv PYCHARM_PROPERTIES "${PYCHARM_PROPERTIES}"
-  export PYCHARM_VM_OPTIONS="${PYCHARM_CONFIG}/.vmoptions"; launchctl setenv PYCHARM_VM_OPTIONS "${PYCHARM_VM_OPTIONS}"
   export PYTHONDONTWRITEBYTECODE=1
   export STARSHIP_CONFIG="${CONFIGS}/starship/config.toml"
   # Stow Directory
@@ -111,8 +109,24 @@ if [ "${BASH_VERSINFO-}" ]; then
   # eval "$(/Users/j5pu/binsh/backup/bats/shts/bin/envfile.sh hook)"
   # eval "$(direnv hook bash)"
   ! command -v pyenv >/dev/null || eval "$(pyenv init -)"
-  ! command -v starship >/dev/null || eval "$(starship init bash)"
-  PROMPT_COMMAND="history -a; history -c; history -r${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+  #######################################
+  # description
+  # Arguments:
+  #  None
+  # Returns:
+  #   $__history_prompt_rc ...
+  #######################################
+  history_prompt() {
+    local __history_prompt_rc=$?
+    history -a; history -c; history -r
+    return $__history_prompt_rc
+  }
+  if command -v starship >/dev/null; then
+#    export starship_precmd_user_func="history_prompt"  # starship_precmd
+    eval "$(starship init bash)"
+    export -f _starship_set_return
+  fi
+  export PROMPT_COMMAND="history_prompt${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi
 
 #echo 4: "$(( SECONDS - start ))"
@@ -122,8 +136,7 @@ fi
 done; unset i
 
 #echo 5: "$(( SECONDS - start ))"
-
-#! command -v compgen >/dev/null || export -f $(compgen -A function | grep -v '^_')
+! command -v compgen >/dev/null || export -f $(compgen -A function | grep -v '^_')
 
 #echo 6: "$(( SECONDS - start ))"
 
