@@ -1,4 +1,4 @@
-# shellcheck disable=SC2046
+# shellcheck shell=sh disable=SC2046
 # System-wide .profile for sh(1)
 start=$SECONDS
 
