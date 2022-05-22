@@ -118,7 +118,7 @@ if [ "${BASH_VERSINFO-}" ]; then
   #######################################
   history_prompt() {
     local __history_prompt_rc=$?
-    history -a; history -c; history -r
+    history -a; history -c; history -r; hash -r
     return $__history_prompt_rc
   }
   if command -v starship >/dev/null; then
