@@ -56,7 +56,7 @@ if [ ! "${CONFIGS-}" ]; then
   export PAGER=less
   export PROMPT_COMMAND="history -a; history -c; history -r"
   export PYTHONDONTWRITEBYTECODE=1
-  export STARSHIP_CONFIG="${CONFIGS}/starship/config.toml"
+  # export STARSHIP_CONFIG="${CONFIGS}/starship/config.toml"
   # Stow Directory
   # https://www.gnu.org/software/stow/manual/stow.html
   #
