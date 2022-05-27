@@ -62,7 +62,7 @@ if [ ! "${CONFIGS-}" ]; then
   #
   export STOW_DIR
 
-  ! test -f /Users/j5pu/secrets/bin/secrets.sh || . /Users/j5pu/secrets/bin/secrets.sh
+  ! test -f /Users/j5pu/Archive/secrets/bin/secrets.sh || . /Users/j5pu/Archive/secrets/bin/secrets.sh
 
   [ ! "${BASH_VERSINFO-}" ] || [ "${BASH_VERSINFO[0]:-0}" -lt 4 ] || shopt -s inherit_errexit
 fi
