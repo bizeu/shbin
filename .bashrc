@@ -23,7 +23,7 @@ esac
 if [ ! "${CONFIGS-}" ]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
   export BATS_NUMBER_OF_PARALLEL_JOBS=400
-  export CONFIGS="/Users/j5pu/shrc/etc/config"
+  export CONFIGS="/Users/j5pu/Archive/shrc/etc/config"
   export DOCKER_COMPLETION_SHOW_CONFIG_IDS=yes
   export DOCKER_COMPLETION_SHOW_CONTAINER_IDS=yes
   export DOCKER_COMPLETION_SHOW_NODE_IDS=yes
