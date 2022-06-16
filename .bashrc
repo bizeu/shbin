@@ -70,6 +70,7 @@ fi
 #echo 2: "$(( SECONDS - start ))"
 
 [ "${PS1-}" ] || return 0
+echo Interactive
 
 if ! alias l >/dev/null 2>&1; then
   alias l='ls -lah'
@@ -83,8 +84,6 @@ if ! alias l >/dev/null 2>&1; then
 fi
 
 #echo 3: "$(( SECONDS - start ))"
-
-! command -v rebash >/dev/null || return 0
 
 #######################################
 # rebash
