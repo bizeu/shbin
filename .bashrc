@@ -70,7 +70,6 @@ fi
 #echo 2: "$(( SECONDS - start ))"
 
 [ "${PS1-}" ] || return 0
-echo Interactive
 
 if ! alias l >/dev/null 2>&1; then
   alias l='ls -lah'
