@@ -69,6 +69,11 @@ fi
 
 #echo 2: "$(( SECONDS - start ))"
 
+if [ ! "${PS1-}" ]; then
+  set -o errtrace functrace
+  return 0
+fi
+
 [ "${PS1-}" ] || return 0
 
 if ! alias l >/dev/null 2>&1; then
@@ -90,8 +95,6 @@ fi
 #  None
 #######################################
 rebash() { unset CONFIGS && unset -f rebash && . /etc/profile; }
-
-set -o functrace errtrace
 
 # No tiene sentido exportar las funciones si no se pueden exportar las shopt, además es un lío
 # depende de la version de bash... no habría solución única
