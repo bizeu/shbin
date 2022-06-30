@@ -1,8 +1,0 @@
-#!/bin/sh
-
-#
-# repo test fail because no function comment in main
-
-main() {
-  :
-}

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-#
-# repo_test script in sh for the repository README.adoc and no main() function
-
-:
