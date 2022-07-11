@@ -5,18 +5,22 @@ start=$SECONDS
 #echo start
 #echo 0: "$(( SECONDS - start ))"
 
-export HOMEBREW_PREFIX="/usr/local"
+#export HOMEBREW_PREFIX="/Volumes/USB-2TB/homebrew"
 
 # This is to keep $PATH from binsh.app first, $PATH is not set
-case ":${PATH}:" in
-  *:/usr/local/bin:*) : ;;
-  *)
-    export PATH="${HOMEBREW_PREFIX}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+unset PATH
+eval "$(/usr/libexec/path_helper -s)"
+eval "$(/Volumes/USB-2TB/homebrew/bin/brew shellenv)"
+export HOMEBREW_CASK_OPTS="--appdir=/Volumes/USB-2TB/Applications --no-quarantine"
+#case ":${PATH}:" in
+#  *:/usr/local/bin:*) : ;;
+#  *)
+#    export PATH="${HOMEBREW_PREFIX}/bin:${HOMEBREW_PREFIX}/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
     ! command -v pyenv >/dev/null || eval "$(pyenv init --path)"
     sudo chsh -s "${HOMEBREW_PREFIX}/bin/bash" j5pu &>/dev/null
     sudo chsh -s "${HOMEBREW_PREFIX}/bin/bash" root &>/dev/null
-    ;;
-esac
+#    ;;
+#esac
 
 #echo 1: "$(( SECONDS - start ))"
 
@@ -36,12 +40,12 @@ if [ ! "${CONFIGS-}" ]; then
   export GIT_COMPLETION_SHOW_ALL="1"
   export GIT_COMPLETION_SHOW_ALL_COMMANDS="1"
   export HOMEBREW_BAT=1
-  export HOMEBREW_CELLAR="${HOMEBREW_PREFIX}/Cellar"
+#  export HOMEBREW_CELLAR="${HOMEBREW_PREFIX}/Cellar"
   export HOMEBREW_NO_ANALYTICS=1
   export HOMEBREW_NO_ENV_HINTS=1
-  export HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
+#  export HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
   export HOMEBREW_PRY=1
-  export INFOPATH="${HOMEBREW_PREFIX}/info:${INFOPATH:-}"
+#  export INFOPATH="${HOMEBREW_PREFIX}/info:${INFOPATH:-}"
   export INPUTRC="${CONFIGS}/readline/inputrc"
   export JETBRAINS="${HOME}/JetBrains"
   export LESS_TERMCAP_mb=$'\e[1;32m'
@@ -52,7 +56,7 @@ if [ ! "${CONFIGS-}" ]; then
   export LESS_TERMCAP_ue=$'\e[0m'
   export LESS_TERMCAP_us=$'\e[1;4;31m'
   export MANPAGER=most
-  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}"
+#  export MANPATH="${HOMEBREW_PREFIX}/share/man${MANPATH+:$MANPATH}:"
   export PAGER=less
   export PROMPT_COMMAND="history -a; history -c; history -r"
   export PYTHONDONTWRITEBYTECODE=1
