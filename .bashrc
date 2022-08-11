@@ -5,8 +5,6 @@ start=$SECONDS
 #echo start
 #echo 0: "$(( SECONDS - start ))"
 
-#export HOMEBREW_PREFIX="/Volumes/USB-2TB/homebrew"
-
 # This is to keep $PATH from binsh.app first, $PATH is not set
 unset PATH
 eval "$(/usr/libexec/path_helper -s)"
