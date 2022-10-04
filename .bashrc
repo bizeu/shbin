@@ -6,7 +6,6 @@ start=$SECONDS
 #echo 0: "$(( SECONDS - start ))"
 
 # This is to keep $PATH from binsh.app first, $PATH is not set
-unset PATH
 eval "$(/usr/libexec/path_helper -s)"
 eval "$(brew shellenv)"
 export HOMEBREW_CASK_OPTS="--appdir=/Applications --no-quarantine"
