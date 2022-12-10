@@ -38,13 +38,13 @@ if [ ! "${CONFIGS-}" ]; then
   export GIT_COMPLETION_SHOW_ALL_COMMANDS="1"
   export HOMEBREW_BAT=1
   export HOMEBREW_BUNDLE_FILE="${HOME}/bbin/Brewfile"
-  export HOMEBREW_CACHE="/Volumes/USB-2TB/Library/Caches/Homebrew"
+  # export HOMEBREW_CACHE="/Volumes/USB-2TB/Library/Caches/Homebrew"
 #  export HOMEBREW_CELLAR="${HOMEBREW_PREFIX}/Cellar"
   export HOMEBREW_NO_ANALYTICS=1
   export HOMEBREW_NO_ENV_HINTS=1
 #  export HOMEBREW_REPOSITORY="${HOMEBREW_PREFIX}/Homebrew"
   export HOMEBREW_PRY=1
-  export HOMEBREW_TEMP="/Volumes/USB-2TB/tmp"
+  # export HOMEBREW_TEMP="/Volumes/USB-2TB/tmp"
 #  export INFOPATH="${HOMEBREW_PREFIX}/info:${INFOPATH:-}"
   export INPUTRC="${CONFIGS}/readline/inputrc"
   export JETBRAINS="${HOME}/JetBrains"
