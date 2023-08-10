@@ -13,4 +13,4 @@ RUN --mount=type=ssh mkdir -p -m 0700 /home/linuxbrew/.ssh \
   && git config --global url."git@github.com:".insteadOf https://github.com
 
 # Clone private repository
-RUN --mount=type=ssh git -C /home/linuxbrew clone git@github.com:j5pu/bats.git
+RUN --mount=type=ssh git -C /home/linuxbrew clone git@github.com:j5pu/secrets.git
